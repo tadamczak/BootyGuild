@@ -1,0 +1,19 @@
+## Interface: 11200
+## Title: BootyGuild
+## Notes: Guild roster and guild statistics, standalone or integrated into Booty Suite.
+## Author: Mukla
+## Version: 0.1.0-dev.1
+## Dependencies: BootyLib
+## SavedVariables: BootyGuildDB
+
+Core\Bootstrap.lua
+Core\Database.lua
+Core\GuildScanController.lua
+Services\RankDisplayPolicy.lua
+Services\RosterService.lua
+Modules\RosterManagement.lua
+Modules\RosterDetails.lua
+Modules\GuildStatistics.lua
+Core\SettingsSchema.lua
+Modules\Controller.lua
+BootyGuild.lua
