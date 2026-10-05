@@ -53,7 +53,10 @@ function RosterManagement.CreateShell(page, contentPanel)
     page.fittedPanel = MOS.UI.Components.CreateContainer(nil, contentPanel)
     page.fittedPanel:SetFrameLevel(contentPanel:GetFrameLevel())
     page.fittedPanel:SetAllPoints(contentPanel)
-    page.fittedPanel:SetBackdrop(contentPanel:GetBackdrop())
+    -- An unstyled host page can return no values from the native getter.
+    -- Keep an explicit nil argument: SetBackdrop() is not SetBackdrop(nil).
+    local contentBackdrop = contentPanel:GetBackdrop()
+    page.fittedPanel:SetBackdrop(contentBackdrop)
     page.fittedPanel:SetBackdropColor(0.025, 0.022, 0.018, 0.99)
     page.fittedPanel:SetBackdropBorderColor(0.36, 0.36, 0.34, 1)
     page.fittedPanel:Hide()
