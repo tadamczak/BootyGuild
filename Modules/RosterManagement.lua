@@ -165,18 +165,21 @@ function RosterManagement.CreateGuildActionHandler(options)
         pendingAction = nil
     end
     StaticPopupDialogs["BOOTY_GUILD_PROMOTE"] = {
+        mosProjectTitle = "Promote Guild Member", mosProjectOwner = options.owner,
         text = "%s", button1 = "Promote", button2 = "Cancel",
         OnAccept = function() Finish(GuildPromoteByName, "Promotion") end,
         OnCancel = function() pendingAction = nil end,
         timeout = 0, whileDead = 1, hideOnEscape = 1,
     }
     StaticPopupDialogs["BOOTY_GUILD_DEMOTE"] = {
+        mosProjectTitle = "Demote Guild Member", mosProjectOwner = options.owner,
         text = "%s", button1 = "Demote", button2 = "Cancel",
         OnAccept = function() Finish(GuildDemoteByName, "Demotion") end,
         OnCancel = function() pendingAction = nil end,
         timeout = 0, whileDead = 1, hideOnEscape = 1,
     }
     StaticPopupDialogs["BOOTY_GUILD_REMOVE"] = {
+        mosProjectTitle = "Remove Guild Member", mosProjectOwner = options.owner,
         text = "%s", button1 = "Remove", button2 = "Cancel",
         OnAccept = function() Finish(GuildUninvite, "Removal") end,
         OnCancel = function() pendingAction = nil end,

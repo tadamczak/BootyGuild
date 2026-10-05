@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-dev.3 — 2026-10-05
+
+- Use the shared window order for standalone Guild, Settings and guild dialogs.
+- Keep member-action and roster-export confirmations above the Guild window.
+
 ## 0.1.0-dev.2 — 2026-10-05
 
 - Fix Guild and guild actions failing to open from Quick Menu.

@@ -5,6 +5,11 @@ local Controller = {}
 Guild.Controller = Controller
 local runtime
 
+local function GuildPromptOwner()
+    local host = runtime and runtime.host
+    return host and (host.windows and host.windows.roster or host.window)
+end
+
 local function WrapOperations()
     local diagnostics = Guild.Diagnostics
     if not diagnostics or not diagnostics.Wrap then return end
@@ -104,7 +109,7 @@ function Controller.Initialize(host)
     runtime.events:RegisterEvent("PLAYER_GUILD_UPDATE")
     runtime.events:RegisterEvent("PLAYER_ENTERING_WORLD")
     StaticPopupDialogs.BOOTY_GUILD_RELOAD = {
-        mosProjectTitle="Export guild roster",text="The guild roster scan is complete. Reload the UI now to write it to disk?",
+        mosProjectTitle="Export guild roster",mosProjectOwner=GuildPromptOwner,text="The guild roster scan is complete. Reload the UI now to write it to disk?",
         button1="Reload now",button2="Later",
         OnAccept=function() if type(ReloadUI)=="function" then ReloadUI() elseif type(ConsoleExec)=="function" then ConsoleExec("reloadui") end end,
         OnCancel=function() Print("Guild data remains in memory. Use /reload before closing the game to save it.") end,
@@ -186,6 +191,7 @@ function Controller.CreateRoster(parent,host)
         getMotd=function() return type(GetGuildRosterMOTD)=="function" and GetGuildRosterMOTD() or "Guild Message of the Day" end,
     })
     requestAction=Roster.CreateGuildActionHandler({
+        owner=page,
         getData=CurrentData,getSelectedName=function() return selectedName end,
         findMember=Guild.Services.Roster.FindMember,findRankName=Guild.Services.Roster.FindRankName,
         queueRefresh=function() Scan.Queue(runtime.scan) end,printMessage=Print,
