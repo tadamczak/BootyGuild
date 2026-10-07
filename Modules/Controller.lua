@@ -4,6 +4,14 @@ local Scan = Guild.Core.GuildScanController
 local Controller = {}
 Guild.Controller = Controller
 local runtime
+local eventNames={"GUILD_ROSTER_UPDATE","PLAYER_GUILD_UPDATE","PLAYER_ENTERING_WORLD"}
+local function Message(value,fallback)
+    if type(value)=="table" then value=value.message or value.code end
+    return tostring(value or fallback or "BootyGuild operation failed.")
+end
+local function RegisterEvents()
+    for _,name in ipairs(eventNames) do runtime.events:RegisterEvent(name) end
+end
 
 local function GuildPromptOwner()
     local host = runtime and runtime.host
@@ -23,6 +31,23 @@ end
 local function Print(message)
     if runtime and runtime.host and runtime.host.Print then runtime.host.Print(message)
     elseif DEFAULT_CHAT_FRAME then DEFAULT_CHAT_FRAME:AddMessage("BootyGuild: "..tostring(message)) end
+end
+
+local function ReloadGuildExport()
+    local shared = BootyLib.Core and BootyLib.Core.Runtime
+    if not shared or type(shared.CanReload) ~= "function" then Print("Reload guard is unavailable.");return false end
+    local ok, ready, reason = pcall(shared.CanReload)
+    if not ok or ready~=true then
+        local failure=reason
+        if not ok then failure=ready end
+        Print(Message(failure,"Reload is currently blocked."));return false
+    end
+    local reload = type(ReloadUI)=="function" and ReloadUI or type(ConsoleExec)=="function" and ConsoleExec
+    if not reload then Print("Reload is unavailable.");return false end
+    local success, result
+    if reload==ReloadUI then success,result=pcall(reload) else success,result=pcall(reload,"reloadui") end
+    if not success or result==false or result==0 then Print(Message(not success and result or nil,"Reload failed."));return false end
+    return true
 end
 
 local function CurrentData()
@@ -83,11 +108,19 @@ function Controller.RequestShared(origin)
 end
 
 function Controller.Initialize(host)
-    if runtime then if host then runtime.host=host end;return true end
-    if not Guild.Database.Ensure() then return false end
-    WrapOperations()
-    runtime = {views={},host=host,stopped=false}
-    runtime.scan = Scan.Create({
+    if runtime then
+        if runtime.cleanupPending then return false,"BootyGuild cleanup is incomplete. Retry Stop before resuming." end
+        if host then runtime.host=host end
+        if runtime.initialized then
+            if runtime.stopped then return Controller.Start() end
+            return true
+        end
+    else
+        if not Guild.Database.Ensure() then return false end
+        runtime = {views={},host=host,stopped=true}
+    end
+    if not runtime.operationsWrapped then WrapOperations();runtime.operationsWrapped=true end
+    if not runtime.scan then runtime.scan = Scan.Create({
         isInGuild=Guild.Services.Roster.IsInGuild,
         requestRoster=function() if type(GuildRoster)=="function" then GuildRoster() end end,
         printMessage=Print,
@@ -102,19 +135,18 @@ function Controller.Initialize(host)
             end
         end,
         onFailure=ScanFailed,
-    })
-    runtime.events=UI.CreateContainer("BootyGuildEventFrame",UIParent)
+    }) end
+    runtime.events=runtime.events or UI.CreateContainer("BootyGuildEventFrame",UIParent)
     runtime.events:SetScript("OnEvent",function() Controller.HandleEvent(event,arg1) end)
-    runtime.events:RegisterEvent("GUILD_ROSTER_UPDATE")
-    runtime.events:RegisterEvent("PLAYER_GUILD_UPDATE")
-    runtime.events:RegisterEvent("PLAYER_ENTERING_WORLD")
+    RegisterEvents()
     StaticPopupDialogs.BOOTY_GUILD_RELOAD = {
         mosProjectTitle="Export guild roster",mosProjectOwner=GuildPromptOwner,text="The guild roster scan is complete. Reload the UI now to write it to disk?",
         button1="Reload now",button2="Later",
-        OnAccept=function() if type(ReloadUI)=="function" then ReloadUI() elseif type(ConsoleExec)=="function" then ConsoleExec("reloadui") end end,
+        OnAccept=ReloadGuildExport,
         OnCancel=function() Print("Guild data remains in memory. Use /reload before closing the game to save it.") end,
         timeout=0,whileDead=1,hideOnEscape=1,
     }
+    runtime.initialized,runtime.stopped=true,false
     return true
 end
 
@@ -277,18 +309,35 @@ end
 function Controller.Stop()
     if not runtime then return true end
     runtime.stopped=true
-    Scan.Finish(runtime.scan);Scan.ClearOrigin(runtime.scan)
-    runtime.events:UnregisterAllEvents();StopProgress()
-    for _,view in pairs(runtime.views) do view:Hide() end
+    local failures={}
+    local function Attempt(callback,owner)
+        local ok,result,reason=pcall(callback,owner)
+        if not ok or result==false then table.insert(failures,Message(reason or result,"BootyGuild cleanup refused.")) end
+    end
+    if runtime.scan then Attempt(Scan.Finish,runtime.scan);Attempt(Scan.ClearOrigin,runtime.scan) end
+    if runtime.events then Attempt(runtime.events.UnregisterAllEvents,runtime.events) end
+    for _,view in pairs(runtime.views) do
+        if view.progress then Attempt(UI.ProgressBar.Stop,view.progress) end
+        if view.Hide then Attempt(view.Hide,view) end
+    end
+    runtime.cleanupPending=table.getn(failures)>0 or nil
+    if runtime.cleanupPending then return false,table.concat(failures," ") end
     return true
 end
 
 function Controller.Start()
-    if not runtime then return Controller.Initialize() end
+    if not runtime or not runtime.initialized then return Controller.Initialize() end
+    if runtime.cleanupPending then return false,"BootyGuild cleanup is incomplete. Retry Stop before resuming." end
+    local called,failure=pcall(RegisterEvents)
+    if not called then
+        local cleaned,reason=Controller.Stop()
+        failure=Message(failure)
+        if not cleaned then failure=failure.." Resume cleanup failed: "..reason end
+        return false,failure
+    end
     runtime.stopped=false
-    runtime.events:RegisterEvent("GUILD_ROSTER_UPDATE");runtime.events:RegisterEvent("PLAYER_GUILD_UPDATE");runtime.events:RegisterEvent("PLAYER_ENTERING_WORLD")
     return true
 end
 
-function Controller.IsBusy() return runtime and Scan.IsPending(runtime.scan) or false end
+function Controller.IsBusy() return runtime and runtime.scan and Scan.IsPending(runtime.scan) or false end
 function Controller.GetRuntime() return runtime end

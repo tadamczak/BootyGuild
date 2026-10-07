@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-dev.5 — 2026-10-07
+
+- Guard roster export reload confirmation against active raid or recording work in every Booty product.
+- Recover failed startup and Resume without duplicating scan or event resources; retain failed cleanup for retry.
+
 ## 0.1.0-dev.4 — 2026-10-07
 
 - Let Guild filters expand for their captions and wrap when needed.
