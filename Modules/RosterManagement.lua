@@ -1174,13 +1174,6 @@ function RosterManagement.ActivateDataController(controller, scanAlreadyStarted)
 end
 
 function RosterManagement.CreateLifecycle(page, dataController, refresh)
-    RosterManagement.RefreshLayout = function() if page:IsVisible() then refresh(false) end end
-    RosterManagement.TrackingChanged = function()
-        if page:IsVisible() then RosterManagement.ActivateDataController(dataController, dataController.refreshPending)
-        else RosterManagement.DeactivateDataController(dataController) end
-        if BootyGuildDB.rosterLiveTrackingEnabled then dataController.refreshButton:Hide() end
-        RosterManagement.RefreshLayout()
-    end
     return {
         Hide = function(self)
             RosterManagement.DeactivateDataController(dataController)

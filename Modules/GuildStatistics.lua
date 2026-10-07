@@ -41,36 +41,6 @@ local function ClearArray(values)
     for index = table.getn(values), 1, -1 do table.remove(values,index) end
 end
 
-function GuildStatistics.CreateSummaryState()
-    return { classes = {}, ranks = {}, classNames = {}, rankList = {}, classSummaries = {}, included = 0, total = 0 }
-end
-
-function GuildStatistics.BuildSummary(state, data, onlyLevel60)
-    state = state or GuildStatistics.CreateSummaryState()
-    state.classes = {}; state.ranks = {}; ClearArray(state.classNames); ClearArray(state.rankList); ClearArray(state.classSummaries)
-    state.included = 0; state.total = table.getn(data and data.members or {})
-    local index
-    for index = 1, state.total do
-        local member = data.members[index]
-        if not onlyLevel60 or tonumber(member.level) == 60 then
-            local className = DisplayClass(member.class)
-            local rankName = DisplayRank(member.rank)
-            state.classes[className] = (state.classes[className] or 0) + 1
-            local rank = state.ranks[rankName]
-            if not rank then rank = { name = rankName, count = 0, index = tonumber(member.rankIndex) or 999 }; state.ranks[rankName] = rank end
-            rank.count = rank.count + 1; state.included = state.included + 1
-        end
-    end
-    local className
-    for className in pairs(state.classes) do table.insert(state.classNames, className) end
-    table.sort(state.classNames, function(a, b) return Lower(a) < Lower(b) end)
-    for index = 1, table.getn(state.classNames) do table.insert(state.classSummaries, { name = state.classNames[index], count = state.classes[state.classNames[index]] }) end
-    local _, rank
-    for _, rank in pairs(state.ranks) do table.insert(state.rankList, rank) end
-    table.sort(state.rankList, function(a, b) if a.index == b.index then return Lower(a.name) < Lower(b.name) end return a.index < b.index end)
-    return state
-end
-
 local function ClassColor(className)
     local key = string.upper(tostring(className or ""))
     return (RAID_CLASS_COLORS and RAID_CLASS_COLORS[key]) or UI.Theme.classColors[key] or whiteClassColor

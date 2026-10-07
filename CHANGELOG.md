@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0-dev.6 — 2026-10-08
+
+- Remove unused legacy guild summary and roster callbacks; retain current screen-owned controllers and data.
+
 ## 0.1.0-dev.5 — 2026-10-07
 
 - Guard roster export reload confirmation against active raid or recording work in every Booty product.
