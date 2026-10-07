@@ -3,6 +3,10 @@ local MOS = BootyGuild
 MOS.Modules.RosterManagement = MOS.Modules.RosterManagement or {}
 local RosterManagement = MOS.Modules.RosterManagement
 
+local function RosterSpan(page)
+    return MOS.UI.Components.GetFrameSpan(page)
+end
+
 function RosterManagement.CreateSections(page)
     if page.tablePanel then return end
     local C = MOS.UI.Components
@@ -570,30 +574,46 @@ function RosterManagement.MeasureColumns(page, columns, members, available)
     if not page.columnMeasure then
         page.columnMeasure = MOS.UI.Components.CreateLabel(page, nil, "OVERLAY", "GameFontHighlightSmall")
         page.columnMeasure:Hide()
+        page.columnMeasureFont, page.columnMeasureSize, page.columnMeasureFlags = page.columnMeasure:GetFont()
     end
     local measure = page.columnMeasure
     measure:SetWidth(0)
-    local index, memberIndex
+    local rows = page.listController and page.listController.rows
+    local body = rows and rows[1]
+    local index, memberIndex, gaps = nil, nil, 0
     for index = 1, table.getn(columns) do
         local column = columns[index]
+        column.leftInset = column.key == "name" and 7 or 0
+        column.rightInset = column.key == "name" and 7 or column.key == "level" and 4 or 6
+        column.gapAfter = column.key == "level" and columns[index + 1] and columns[index + 1].key == "class" and 8 or 0
+        gaps = gaps + column.gapAfter
+        local padding = column.leftInset + column.rightInset
+        local font, size, flags = (column.header.label or column.header):GetFont()
+        measure:SetFont(font, size, flags)
         measure:SetText(column.header.baseText or "")
-        local padding = column.key == "name" and 14 or 6
-        local desired = measure:GetStringWidth() + padding
+        local headerWidth = math.ceil(measure:GetStringWidth()) + padding
+        if body and body[column.key] then font, size, flags = body[column.key]:GetFont()
+        else font, size, flags = page.columnMeasureFont, page.columnMeasureSize, page.columnMeasureFlags end
+        measure:SetFont(font, size, flags)
+        local desired = headerWidth
         for memberIndex = 1, table.getn(members) do
             local member = members[memberIndex]
             local value = column.key == "lastOnline" and RosterManagement.FormatLastOnline(member) or member[rosterFieldNames[column.key] or column.key]
             measure:SetText(value or ""); measure:SetWidth(0)
-            desired = math.max(desired, measure:GetStringWidth() + padding)
+            desired = math.max(desired, math.ceil(measure:GetStringWidth()) + padding)
         end
         if column.key == "notes" or column.key == "officer" then desired = math.min(240, desired) end
-        column.growthWeight = (column.key == "name" or column.key == "zone" or column.key == "notes" or column.key == "officer") and column.fraction or 0
+        if column.key == "class" then desired = math.max(headerWidth, math.min(130, desired)) end
+        column.growthWeight = (column.key == "name" or column.key == "zone") and desired
+            or (column.key == "notes" or column.key == "officer") and column.fraction or 0
         column.desiredWidth = desired
-        column.minimumWidth = column.growthWeight == 0 and desired or math.min(desired, column.key == "name" and 80 or 36)
+        column.minimumWidth = column.key == "class" and headerWidth
+            or column.growthWeight == 0 and desired or math.min(desired, column.key == "name" and 80 or 36)
     end
     local growth = 0
     for index = 1, table.getn(columns) do growth = growth + columns[index].growthWeight end
     if growth == 0 then for index = 1, table.getn(columns) do columns[index].growthWeight = columns[index].fraction end end
-    MOS.UI.Components.Table.AllocateColumnWidths(columns, available)
+    MOS.UI.Components.Table.AllocateColumnWidths(columns, math.max(1, available - gaps))
 end
 
 function RosterManagement.ApplyRowColumns(row, columns, tableWidth)
@@ -604,10 +624,10 @@ function RosterManagement.ApplyRowColumns(row, columns, tableWidth)
         local width = column.width or math.floor(tableWidth * column.fraction)
         local cell = row[column.key]
         cell:ClearAllPoints()
-        cell:SetPoint("TOPLEFT", row, "TOPLEFT", columnX + (column.key == "name" and 7 or 0), -1)
-        cell:SetWidth(math.max(1, width - (column.key == "name" and 14 or 6)))
+        cell:SetPoint("TOPLEFT", row, "TOPLEFT", columnX + (column.leftInset or (column.key == "name" and 7 or 0)), -1)
+        cell:SetWidth(math.max(1, width - (column.leftInset or 0) - (column.rightInset or (column.key == "name" and 14 or 6))))
         cell:Show()
-        columnX = columnX + width
+        columnX = columnX + width + (column.gapAfter or 0)
     end
 end
 
@@ -644,17 +664,17 @@ function RosterManagement.LayoutColumns(page, rows, columns, tableWidth, headerY
         local width = column.width or math.floor(tableWidth * column.fraction)
         column.header:ClearAllPoints()
         column.header:SetPoint("TOPLEFT", page.tablePanel or page, "TOPLEFT", 6 + columnX, headerY)
-        column.header:SetWidth(math.max(1, width - 6))
+        column.header:SetWidth(math.max(1, width - (column.rightInset or 6)))
         if BootyGuildDB.rosterShowColumnHeaders ~= false then column.header:Show() end
         local rowIndex
         for rowIndex = 1, table.getn(rows) do
             local cell = rows[rowIndex][column.key]
             cell:ClearAllPoints()
-            cell:SetPoint("TOPLEFT", rows[rowIndex], "TOPLEFT", columnX + (column.key == "name" and 7 or 0), -1)
-            cell:SetWidth(math.max(1, width - (column.key == "name" and 14 or 6)))
+            cell:SetPoint("TOPLEFT", rows[rowIndex], "TOPLEFT", columnX + (column.leftInset or (column.key == "name" and 7 or 0)), -1)
+            cell:SetWidth(math.max(1, width - (column.leftInset or 0) - (column.rightInset or (column.key == "name" and 14 or 6))))
             cell:Show()
         end
-        columnX = columnX + width
+        columnX = columnX + width + (column.gapAfter or 0)
     end
 end
 
@@ -851,7 +871,7 @@ function RosterManagement.RenderList(page, visibleMembers, columns, selectedName
     local rows = controller.rows
     local rowHeight = controller.rowHeight
     local body = page.tablePanel or page
-    local panelWidth = page:GetWidth()
+    local panelWidth = RosterSpan(page)
     page.rowsHeaderY = headerY
     local rowsTop = headerY - (BootyGuildDB.rosterShowColumnHeaders == false and 2 or 24)
     local bottom = 34 + (page.summaryWrap and 22 or 0)
@@ -1041,12 +1061,13 @@ function RosterManagement.RefreshView(renderer, data, guildName, resetScroll, so
     renderer.summaryText:SetWidth(0)
     renderer.summaryText:SetText("|cffffffff" .. memberCount .. "|r |cffffd100Guild Members|r  |  |cffffffff" .. onlineCount .. "|r |cffffd100Online|r")
     renderer.summaryText:Show()
+    -- Captions must be current before their natural widths determine layout.
+    page.filterController:Build(data)
     local rosterShift = RosterManagement.LayoutChrome(page, page.layoutControls, renderer.getMotd())
     local query = string.lower(renderer.searchBox:GetText() or "")
     query = string.gsub(query, "^%s*(.-)%s*$", "%1")
     if BootyGuildDB.rosterShowSearch == false then query = "" end
 
-    page.filterController:Build(data)
     RosterManagement.FilterMembers(renderer.visibleMembers, data, query, BootyGuildDB.rosterShowClassFilter ~= false and renderer.selectedClasses or nil, BootyGuildDB.rosterShowRankFilter ~= false and renderer.selectedRanks or nil, BootyGuildDB.showOfflineMembers)
     table.sort(renderer.visibleMembers, renderer.sortMembers)
 
@@ -1081,7 +1102,7 @@ end
 
 function RosterManagement.LayoutSummary(page, summary)
     local panel = page.tablePanel or page
-    local width = page:GetWidth()
+    local width = RosterSpan(page)
     page.summaryWrap = false
     local label = page.modeButton.label
     if not page.summaryFontSize then
@@ -1238,6 +1259,26 @@ local function PlaceRosterFilter(page, control, visible, controlWidth, x, y)
     return x + (controlWidth or control:GetWidth()) + 8
 end
 
+local function RosterCaptionWidth(page, control, padding, minimum)
+    local label = control.label or control
+    local caption = control:GetText() or ""
+    local font, size, flags = label:GetFont()
+    if control.mosRosterCaption == caption and control.mosRosterFont == font
+        and control.mosRosterSize == size and control.mosRosterFlags == flags then
+        return control.mosRosterWidth
+    end
+    local measure = page.rosterFilterMeasure
+    if not measure then
+        measure = MOS.UI.Components.CreateLabel(page, nil, "OVERLAY", "GameFontHighlightSmall")
+        measure:SetWidth(0); measure:Hide(); page.rosterFilterMeasure = measure
+    end
+    measure:SetFont(font, size, flags); measure:SetText(caption)
+    local width = math.max(minimum, math.ceil(measure:GetStringWidth()) + padding)
+    control.mosRosterCaption, control.mosRosterFont = caption, font
+    control.mosRosterSize, control.mosRosterFlags, control.mosRosterWidth = size, flags, width
+    return width
+end
+
 function RosterManagement.UpdateSectionHeader(page)
     local shift = BootyGuildDB.rosterHideSectionHeader and 42 or 0
     if page.sectionTitle then if shift > 0 then page.sectionTitle:Hide() else page.sectionTitle:Show() end end
@@ -1253,7 +1294,7 @@ function RosterManagement.LayoutChrome(page, controls, motdText)
     if page.actionsPanel then MOS.UI.Components.JoinSurfaceEdges(page.actionsPanel, true, false, leftOutset, 1.5) end
     local actionBottom = getPresentation and getPresentation("hideStatusVersionBar") and 3.5 or 6
     if page.actionsPanel then page.actionsPanel:SetHeight(28 + actionBottom) end
-    local width = page:GetWidth()
+    local width, height = RosterSpan(page)
     local headerShift = RosterManagement.UpdateSectionHeader(page)
     controls.footer.guild:SetText("Guild Message Of The Day:")
     controls.footer.guild:SetPoint("TOPRIGHT", controls.footer, "TOPRIGHT", -8, -4)
@@ -1261,7 +1302,7 @@ function RosterManagement.LayoutChrome(page, controls, motdText)
     controls.footer.guild:SetHeight(0)
     controls.footer.motd:ClearAllPoints()
     controls.footer.motd:SetPoint("TOPLEFT", controls.footer.guild, "BOTTOMLEFT", 0, -6)
-    controls.footer.motd:SetWidth(math.max(1, page:GetWidth() - 16))
+    controls.footer.motd:SetWidth(math.max(1, width - 16))
     if controls.footer.motd.SetWordWrap then controls.footer.motd:SetWordWrap(true) end
     if controls.footer.motd.SetNonSpaceWrap then controls.footer.motd:SetNonSpaceWrap(true) end
     controls.footer.motd:SetHeight(0)
@@ -1283,28 +1324,45 @@ function RosterManagement.LayoutChrome(page, controls, motdText)
             page.tablePanel:SetPoint("TOPLEFT", controls.footer, "BOTTOMLEFT", 0, 0)
             page.tablePanel:SetPoint("BOTTOMRIGHT", page.actionsPanel, "TOPRIGHT", 0, 0)
         end
-        page.tablePanelHeight = math.max(0, page:GetHeight() - top - page.actionsPanel:GetHeight())
+        page.tablePanelHeight = math.max(0, height - top - page.actionsPanel:GetHeight())
     end
     width = math.max(1, width)
     local settings = BootyGuildDB or {}
     local x, y = 6, -8
     local hasFilters = settings.rosterShowClassFilter ~= false or settings.rosterShowRankFilter ~= false
+    local available = math.max(1, width - 12)
+    local flow = page.rosterFilterFlow
+    if not flow then flow = {}; page.rosterFilterFlow = flow end
+    for index = table.getn(flow), 1, -1 do table.remove(flow, index) end
     controls.filtersLabel:Hide()
-    x = PlaceRosterFilter(page, controls.classFilter, settings.rosterShowClassFilter ~= false, width < 650 and 60 or 84, x, y)
-    x = PlaceRosterFilter(page, controls.rankFilter, settings.rosterShowRankFilter ~= false, width < 650 and 60 or 84, x, y)
-    local offlineWidth=(settings.rosterShowOffline ~= false) and 112 or 6
-    local filterWrap = hasFilters and (settings.rosterShowSearch ~= false or settings.rosterShowOffline ~= false) and x + (settings.rosterShowSearch ~= false and 48 or 0) + offlineWidth > width - 6
-    if filterWrap then x = 6; y = y - 28 end
-    controls.searchLabel:Hide()
-    local searchAvailable = width - x - offlineWidth
-    x = PlaceRosterFilter(page, controls.searchBox, settings.rosterShowSearch ~= false, math.max(40, math.min(218, searchAvailable)), x, y)
-    if settings.rosterShowSearch ~= false and settings.rosterShowOffline == false and searchAvailable < 218 then
-        -- Resolve the right edge natively; sampled parent widths can lag a resize.
-        controls.searchBox:SetPoint("TOPRIGHT", page.tablePanel or page, "TOPRIGHT", -6, y)
+    controls.classFilter:SetHeight(24); controls.rankFilter:SetHeight(24)
+    if settings.rosterShowClassFilter ~= false then
+        controls.classFilter.mosFlowWidth = RosterCaptionWidth(page, controls.classFilter, 30, 84)
+        controls.classFilter:Show(); table.insert(flow, controls.classFilter)
+    else controls.classFilter:Hide() end
+    if settings.rosterShowRankFilter ~= false then
+        controls.rankFilter.mosFlowWidth = RosterCaptionWidth(page, controls.rankFilter, 30, 84)
+        controls.rankFilter:Show(); table.insert(flow, controls.rankFilter)
+    else controls.rankFilter:Hide() end
+    local filterBottom = MOS.UI.Components.LayoutFlow(page.filterToolbar or page.tablePanel or page, flow, 6, 8, available, 8)
+    if table.getn(flow) > 0 then
+        local last = flow[table.getn(flow)]
+        local _, _, _, lastX, lastY = last:GetPoint(1)
+        x, y = lastX + math.min(available, last.mosFlowWidth) + 8, lastY
+        MOS.UI.Components.ReflowControlText(controls.classFilter); MOS.UI.Components.ReflowControlText(controls.rankFilter)
     end
-    x = PlaceRosterFilter(page, controls.showOffline.label, settings.rosterShowOffline ~= false, 70, x, y)
-    if settings.rosterShowOffline ~= false then x = x - 6 end
-    x = PlaceRosterFilter(page, controls.showOffline, settings.rosterShowOffline ~= false, nil, x, y)
+    local offlineLabelWidth = settings.rosterShowOffline ~= false and RosterCaptionWidth(page, controls.showOffline.label, 2, 70) or 0
+    local offlineWidth = settings.rosterShowOffline ~= false and offlineLabelWidth + 26 or 0
+    local searchShown, offlineShown = settings.rosterShowSearch ~= false, settings.rosterShowOffline ~= false
+    local groupMinimum = (searchShown and 40 or 0) + (searchShown and offlineShown and 8 or 0) + offlineWidth
+    if hasFilters and groupMinimum > width - 6 - x then x, y = 6, -filterBottom - 4 end
+    controls.searchLabel:Hide()
+    local searchAvailable = math.max(1, width - 6 - x - offlineWidth - (offlineShown and 8 or 0))
+    x = PlaceRosterFilter(page, controls.searchBox, searchShown, math.min(218, searchAvailable), x, y)
+    offlineLabelWidth = math.min(offlineLabelWidth, math.max(1, width - 6 - x - 26))
+    x = PlaceRosterFilter(page, controls.showOffline.label, offlineShown, offlineLabelWidth, x, y)
+    if offlineShown then x = x - 6 end
+    x = PlaceRosterFilter(page, controls.showOffline, offlineShown, 24, x, y)
     controls.classFilter:SetHeight(24); controls.rankFilter:SetHeight(24); controls.searchBox:SetHeight(24); controls.showOffline:SetWidth(24); controls.showOffline:SetHeight(24)
     controls.showOffline.label:SetTextColor(1, 1, 1)
     controls.showOffline.label:SetHeight(24); controls.showOffline.label:SetJustifyV("MIDDLE")

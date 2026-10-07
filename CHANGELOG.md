@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.1.0-dev.4 — 2026-10-07
+
+- Let Guild filters expand for their captions and wrap when needed.
+- Keep Lvl compact with a clear gap before Class; give Name and Zone available space.
+
 ## 0.1.0-dev.3 — 2026-10-05
 
 - Use the shared window order for standalone Guild, Settings and guild dialogs.
