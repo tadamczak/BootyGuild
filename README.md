@@ -11,3 +11,5 @@ Join a guild to use Guild and Guild Stats. Scan Guild Data to capture the roster
 Standalone Settings has two main sections: **Profile** and **Guild**. Use **Profile → General** to add, save, load, delete or export named settings profiles in either standalone mode or Booty Suite. Reset restores settings defaults and retains guild data.
 
 Settings and guild dialogs open above the window that launched them, including in standalone mode.
+
+Guild filters expand to fit their captions and move to another row when needed. The roster keeps Lvl compact and uses the remaining space for longer Name and Zone values.
