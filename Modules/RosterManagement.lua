@@ -1,15 +1,15 @@
-local MOS = BootyGuild
+local Booty = BootyGuild
 
-MOS.Modules.RosterManagement = MOS.Modules.RosterManagement or {}
-local RosterManagement = MOS.Modules.RosterManagement
+Booty.Modules.RosterManagement = Booty.Modules.RosterManagement or {}
+local RosterManagement = Booty.Modules.RosterManagement
 
 local function RosterSpan(page)
-    return MOS.UI.Components.GetFrameSpan(page)
+    return Booty.UI.Components.GetFrameSpan(page)
 end
 
 function RosterManagement.CreateSections(page)
     if page.tablePanel then return end
-    local C = MOS.UI.Components
+    local C = Booty.UI.Components
     local backdrop = { bgFile = "Interface\\Buttons\\WHITE8X8", edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 8, edgeSize = 12, insets = { left = 3, right = 3, top = 3, bottom = 3 } }
     page.tablePanel = C.CreateContainer(nil, page)
     page.actionsPanel = C.CreateContainer(nil, page)
@@ -32,29 +32,29 @@ end
 function RosterManagement.CreateShell(page, contentPanel)
     RosterManagement.CreateSections(page)
     page.detailsOwner = contentPanel:GetParent()
-    local title = MOS.UI.Components.CreateHeading(page, "", 1, "gold", "roster")
+    local title = Booty.UI.Components.CreateHeading(page, "", 1, "gold", "roster")
     title:SetPoint("TOPLEFT", page, "TOPLEFT", 6, -10)
     title:SetText("Guild"); page.sectionTitle = title
 
-    local searchLabel = MOS.UI.Components.CreateLabel(page.tablePanel or page, nil, "OVERLAY", "GameFontNormalSmall")
+    local searchLabel = Booty.UI.Components.CreateLabel(page.tablePanel or page, nil, "OVERLAY", "GameFontNormalSmall")
     searchLabel:SetPoint("TOPRIGHT", page, "TOPRIGHT", -192, -87)
     searchLabel:SetText("");searchLabel:Hide()
-    local searchBox = MOS.UI.Components.CreateFramedEditBox(page.tablePanel or page, "BootyGuildRosterSearch", 178)
+    local searchBox = Booty.UI.Components.CreateFramedEditBox(page.tablePanel or page, "BootyGuildRosterSearch", 178)
     searchBox:SetPoint("TOPRIGHT", page, "TOPRIGHT", -4, -81)
-    MOS.UI.Components.AttachPlaceholder(searchBox,"Search...")
+    Booty.UI.Components.AttachPlaceholder(searchBox,"Search...")
 
-    local status = MOS.UI.Components.CreateLabel(page, nil, "OVERLAY", "GameFontHighlightSmall")
+    local status = Booty.UI.Components.CreateLabel(page, nil, "OVERLAY", "GameFontHighlightSmall")
     status:SetPoint("TOPLEFT", page, "TOPLEFT", 4, -40)
     status:SetWidth(565)
     status:SetJustifyH("LEFT")
-    local lastScan = MOS.UI.Components.CreateLabel(page.tablePanel or page, nil, "OVERLAY", "GameFontDisableSmall")
+    local lastScan = Booty.UI.Components.CreateLabel(page.tablePanel or page, nil, "OVERLAY", "GameFontDisableSmall")
     lastScan:SetPoint("TOPLEFT", page, "TOPLEFT", 4, -58)
     lastScan:SetWidth(330)
     lastScan:SetJustifyH("LEFT")
 
     -- This panel follows the full content area; row capacity must not depend on
     -- the fitted visual panel height calculated during the preceding refresh.
-    page.fittedPanel = MOS.UI.Components.CreateContainer(nil, contentPanel)
+    page.fittedPanel = Booty.UI.Components.CreateContainer(nil, contentPanel)
     page.fittedPanel:SetFrameLevel(contentPanel:GetFrameLevel())
     page.fittedPanel:SetAllPoints(contentPanel)
     -- An unstyled host page can return no values from the native getter.
@@ -68,29 +68,29 @@ function RosterManagement.CreateShell(page, contentPanel)
 end
 
 function RosterManagement.CreateGuildControls(page)
-    local scanButton = MOS.UI.Components.CreateButton(page, nil, "Scan Guild Data", 140, 24)
+    local scanButton = Booty.UI.Components.CreateButton(page, nil, "Scan Guild Data", 140, 24)
     scanButton:SetPoint("CENTER", page, "CENTER", 0, 12)
-    local refreshButton = MOS.UI.Components.CreateIconButton(page.actionsPanel or page, nil, "Interface\\Buttons\\UI-RotationRight-Button-Up", 24)
+    local refreshButton = Booty.UI.Components.CreateIconButton(page.actionsPanel or page, nil, "Interface\\Buttons\\UI-RotationRight-Button-Up", 24)
     refreshButton:SetPoint("TOPRIGHT", page, "TOPRIGHT", -4, -48)
-    MOS.UI.Components.AttachTooltip(refreshButton, "Refresh guild data", "Refresh the saved guild roster. Hidden while Live tracking is active.")
+    Booty.UI.Components.AttachTooltip(refreshButton, "Refresh guild data", "Refresh the saved guild roster. Hidden while Live tracking is active.")
     refreshButton:Hide()
-    local exportButton = MOS.UI.Components.CreateButton(page, nil, "Export Guild", 120, 22)
+    local exportButton = Booty.UI.Components.CreateButton(page, nil, "Export Guild", 120, 22)
     exportButton:SetPoint("CENTER", page, "CENTER", 96, 12)
 
-    page.guildInfoEditor = MOS.UI.Components.CreateTextEditor("BootyGuildGuildInfoEditor", "Guild Information", 500, function(value)
+    page.guildInfoEditor = Booty.UI.Components.CreateTextEditor("BootyGuildGuildInfoEditor", "Guild Information", 500, function(value)
         if type(SetGuildInfoText) == "function" then SetGuildInfoText(value) end
     end)
-    page.guildInfoEditor.title:SetTextColor(unpack(MOS.UI.Components.Theme.colors.goldText))
-    page.guildMotdEditor = MOS.UI.Components.CreateTextEditor("BootyGuildGuildMotdEditor", "Guild Message of the Day", 128, function(value)
+    page.guildInfoEditor.title:SetTextColor(unpack(Booty.UI.Components.Theme.colors.goldText))
+    page.guildMotdEditor = Booty.UI.Components.CreateTextEditor("BootyGuildGuildMotdEditor", "Guild Message of the Day", 128, function(value)
         if type(GuildSetMOTD) == "function" then GuildSetMOTD(value) end
     end)
-    page.guildInfoButton = MOS.UI.Components.CreateButton(page.actionsPanel or page, nil, "Guild Information", 108, 22)
-    page.guildAddButton = MOS.UI.Components.CreateButton(page.actionsPanel or page, nil, "Add Member", 84, 22)
-    page.guildControlButton = MOS.UI.Components.CreateButton(page.actionsPanel or page, nil, "Guild Control", 88, 22)
+    page.guildInfoButton = Booty.UI.Components.CreateButton(page.actionsPanel or page, nil, "Guild Information", 108, 22)
+    page.guildAddButton = Booty.UI.Components.CreateButton(page.actionsPanel or page, nil, "Add Member", 84, 22)
+    page.guildControlButton = Booty.UI.Components.CreateButton(page.actionsPanel or page, nil, "Guild Control", 88, 22)
     local _, button
     for _, button in ipairs({ page.guildInfoButton, page.guildAddButton, exportButton, page.guildControlButton }) do
-        MOS.UI.Components.SetClassicButtonVariant(button, "red")
-        MOS.UI.Components.SetClassicButtonGold(button, true)
+        Booty.UI.Components.SetClassicButtonVariant(button, "red")
+        Booty.UI.Components.SetClassicButtonGold(button, true)
     end
     page.guildInfoButton:Hide(); page.guildAddButton:Hide(); page.guildControlButton:Hide()
     RosterManagement.BindPermissionEvents(page)
@@ -105,12 +105,12 @@ function RosterManagement.CreateGuildControls(page)
         return true
     end
     function controls.OpenAddMember()
-        if not MOS.Services.Roster.CanInviteMember() then return false end
+        if not Booty.Services.Roster.CanInviteMember() then return false end
         if page.guildInviteDialog and page.guildInviteDialog:IsShown() then
             page.guildInviteDialog:Hide(); return true
         end
         if not page.guildInviteDialog then
-            local C = MOS.UI.Components
+            local C = Booty.UI.Components
             local dialog = C.Window.CreateProjectConfirmation("BootyGuildGuildInvite", "Add Member", "Invite", "roster", {modal=false})
             dialog:SetWidth(320)
             dialog.memberName = C.CreateFramedEditBox(dialog, "BootyGuildGuildInviteName", 304)
@@ -123,34 +123,34 @@ function RosterManagement.CreateGuildControls(page)
         end
         local dialog = page.guildInviteDialog
         dialog:Open("Character name", function()
-            MOS.Services.Roster.InviteMember(dialog.memberName:GetText())
+            Booty.Services.Roster.InviteMember(dialog.memberName:GetText())
         end)
         dialog.label:SetHeight(18); dialog:SetHeight(128)
         dialog.memberName:SetText(""); dialog.memberName:SetFocus()
         return true
     end
     function controls.GetQuickState()
-        return { gmotd = true, guildInformation = true, addMember = MOS.Services.Roster.CanInviteMember() }
+        return { gmotd = true, guildInformation = true, addMember = Booty.Services.Roster.CanInviteMember() }
     end
     page.guildInfoButton:SetScript("OnClick", controls.OpenGuildInformation)
     page.guildAddButton:SetScript("OnClick", controls.OpenAddMember)
-    page.guildControlButton:SetScript("OnClick", function() if not MOS.Services.Roster.CanManage("control") then return end; if type(GuildControlPopupFrame_Toggle) == "function" then GuildControlPopupFrame_Toggle() elseif type(ToggleGuildFrame) == "function" then ToggleGuildFrame() end end)
+    page.guildControlButton:SetScript("OnClick", function() if not Booty.Services.Roster.CanManage("control") then return end; if type(GuildControlPopupFrame_Toggle) == "function" then GuildControlPopupFrame_Toggle() elseif type(ToggleGuildFrame) == "function" then ToggleGuildFrame() end end)
 
-    page.footer = MOS.UI.Components.CreateControl(nil, page)
+    page.footer = Booty.UI.Components.CreateControl(nil, page)
     page.footer:SetPoint("BOTTOMLEFT", page, "BOTTOMLEFT", 4, 4); page.footer:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", -4, 4); page.footer:SetHeight(38)
     page.footer:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8X8", edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 8, edgeSize = 8, insets = { left = 2, right = 2, top = 2, bottom = 2 } })
-    MOS.UI.Components.RegisterSkinnedSurface(page.footer, "content", { bgFile = "Interface\\Buttons\\WHITE8X8", edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", edgeSize = 12 }, {0.025, 0.022, 0.018, 0.99}, {0.36, 0.36, 0.34, 1})
-    page.footer.guild = MOS.UI.Components.CreateLabel(page.footer, nil, "OVERLAY", "GameFontNormalSmall"); page.footer.guild:SetPoint("TOPLEFT", page.footer, "TOPLEFT", 8, -4)
-    page.footer.motd = MOS.UI.Components.CreateLabel(page.footer, nil, "OVERLAY", "GameFontHighlightSmall"); page.footer.motd:SetPoint("BOTTOMLEFT", page.footer, "BOTTOMLEFT", 8, 6); page.footer.motd:SetJustifyH("LEFT")
+    Booty.UI.Components.RegisterSkinnedSurface(page.footer, "content", { bgFile = "Interface\\Buttons\\WHITE8X8", edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", edgeSize = 12 }, {0.025, 0.022, 0.018, 0.99}, {0.36, 0.36, 0.34, 1})
+    page.footer.guild = Booty.UI.Components.CreateLabel(page.footer, nil, "OVERLAY", "GameFontNormalSmall"); page.footer.guild:SetPoint("TOPLEFT", page.footer, "TOPLEFT", 8, -4)
+    page.footer.motd = Booty.UI.Components.CreateLabel(page.footer, nil, "OVERLAY", "GameFontHighlightSmall"); page.footer.motd:SetPoint("BOTTOMLEFT", page.footer, "BOTTOMLEFT", 8, 6); page.footer.motd:SetJustifyH("LEFT")
     page.footer:SetScript("OnClick", controls.OpenGMOTD)
-    MOS.UI.Components.AttachTooltip(page.footer, "Guild Message of the Day", "Click to edit the guild message of the day.")
+    Booty.UI.Components.AttachTooltip(page.footer, "Guild Message of the Day", "Click to edit the guild message of the day.")
     page.footer:Hide()
     local font, size, flags = page.footer.guild:GetFont()
     page.footer.guild:SetFont(font, size, flags)
-    MOS.UI.Components.JoinSurfaceEdges(page.footer, false, true)
+    Booty.UI.Components.JoinSurfaceEdges(page.footer, false, true)
     font, size, flags = page.footer.motd:GetFont()
     page.footer.motd:SetFont(font, size + 1, flags)
-    page.footer.rule = MOS.UI.Components.CreateTexture(page, nil, "ARTWORK")
+    page.footer.rule = Booty.UI.Components.CreateTexture(page, nil, "ARTWORK")
     page.footer.rule:SetPoint("TOPLEFT", page.footer, "BOTTOMLEFT", 8, -8)
     page.footer.rule:SetPoint("TOPRIGHT", page.footer, "BOTTOMRIGHT", 0, -8)
     page.footer.rule:SetHeight(1); page.footer.rule:SetTexture(0.55, 0.42, 0.16, 0.75)
@@ -162,28 +162,28 @@ function RosterManagement.CreateGuildActionHandler(options)
     local function Finish(apiFunction, verb)
         if pendingAction and type(apiFunction) == "function" then
             local memberName = pendingAction.name
-            if not MOS.Services.Roster.PerformMemberAction(pendingAction.action, memberName) then pendingAction = nil; return end
+            if not Booty.Services.Roster.PerformMemberAction(pendingAction.action, memberName) then pendingAction = nil; return end
             options.printMessage(verb .. " requested for " .. memberName .. ".")
             options.queueRefresh()
         end
         pendingAction = nil
     end
     StaticPopupDialogs["BOOTY_GUILD_PROMOTE"] = {
-        mosProjectTitle = "Promote Guild Member", mosProjectOwner = options.owner,
+        bootyProjectTitle = "Promote Guild Member", bootyProjectOwner = options.owner,
         text = "%s", button1 = "Promote", button2 = "Cancel",
         OnAccept = function() Finish(GuildPromoteByName, "Promotion") end,
         OnCancel = function() pendingAction = nil end,
         timeout = 0, whileDead = 1, hideOnEscape = 1,
     }
     StaticPopupDialogs["BOOTY_GUILD_DEMOTE"] = {
-        mosProjectTitle = "Demote Guild Member", mosProjectOwner = options.owner,
+        bootyProjectTitle = "Demote Guild Member", bootyProjectOwner = options.owner,
         text = "%s", button1 = "Demote", button2 = "Cancel",
         OnAccept = function() Finish(GuildDemoteByName, "Demotion") end,
         OnCancel = function() pendingAction = nil end,
         timeout = 0, whileDead = 1, hideOnEscape = 1,
     }
     StaticPopupDialogs["BOOTY_GUILD_REMOVE"] = {
-        mosProjectTitle = "Remove Guild Member", mosProjectOwner = options.owner,
+        bootyProjectTitle = "Remove Guild Member", bootyProjectOwner = options.owner,
         text = "%s", button1 = "Remove", button2 = "Cancel",
         OnAccept = function() Finish(GuildUninvite, "Removal") end,
         OnCancel = function() pendingAction = nil end,
@@ -193,12 +193,12 @@ function RosterManagement.CreateGuildActionHandler(options)
         if action == "refresh" then options.queueRefresh(); return end
         local data = options.getData()
         local member = requestedMember or options.findMember(data, options.getSelectedName())
-        if not member or not MOS.Services.Roster.CanManage(action, member) then return end
+        if not member or not Booty.Services.Roster.CanManage(action, member) then return end
         if action == "group" then
-            MOS.Services.Roster.PerformMemberAction("group", member.name); return
+            Booty.Services.Roster.PerformMemberAction("group", member.name); return
         elseif action == "remove" then
             pendingAction = { name = member.name, action = action }
-            MOS.UI.Components.ShowOpaquePopup("BOOTY_GUILD_REMOVE", "Remove " .. member.name .. " from the guild?")
+            Booty.UI.Components.ShowOpaquePopup("BOOTY_GUILD_REMOVE", "Remove " .. member.name .. " from the guild?")
             return
         end
         local direction = action == "promote" and -1 or 1
@@ -206,46 +206,46 @@ function RosterManagement.CreateGuildActionHandler(options)
         if action == "promote" or action == "demote" then
             pendingAction = { name = member.name, action = action }
             local label = action == "promote" and "Promote" or "Demote"
-            MOS.UI.Components.ShowOpaquePopup(action == "promote" and "BOOTY_GUILD_PROMOTE" or "BOOTY_GUILD_DEMOTE", label .. " " .. member.name .. "?\n" .. (member.rank or "Unknown") .. " -> " .. targetRank)
+            Booty.UI.Components.ShowOpaquePopup(action == "promote" and "BOOTY_GUILD_PROMOTE" or "BOOTY_GUILD_DEMOTE", label .. " " .. member.name .. "?\n" .. (member.rank or "Unknown") .. " -> " .. targetRank)
         end
     end
 end
 
 function RosterManagement.CreateFilterView(page)
-    local sortHint = MOS.UI.Components.CreateLabel(page.tablePanel or page, nil, "OVERLAY", "GameFontDisableSmall")
+    local sortHint = Booty.UI.Components.CreateLabel(page.tablePanel or page, nil, "OVERLAY", "GameFontDisableSmall")
     sortHint:SetPoint("TOPLEFT", page, "TOPLEFT", 4, -114)
     sortHint:SetText("Click a column header to sort")
     sortHint:Hide()
-    local label = MOS.UI.Components.CreateLabel(page.tablePanel or page, nil, "OVERLAY", "GameFontNormalSmall")
+    local label = Booty.UI.Components.CreateLabel(page.tablePanel or page, nil, "OVERLAY", "GameFontNormalSmall")
     label:SetPoint("TOPLEFT", page, "TOPLEFT", 4, -112)
     label:SetText("")
 
-    local classToggle = MOS.UI.Components.CreateDropdownButton(page.tablePanel or page, nil, "Class", 84)
+    local classToggle = Booty.UI.Components.CreateDropdownButton(page.tablePanel or page, nil, "Class", 84)
     classToggle:SetPoint("TOPLEFT", page, "TOPLEFT", 50, -106)
-    local rankToggle = MOS.UI.Components.CreateDropdownButton(page.tablePanel or page, nil, "Rank", 84)
+    local rankToggle = Booty.UI.Components.CreateDropdownButton(page.tablePanel or page, nil, "Rank", 84)
     rankToggle:SetPoint("TOPLEFT", page, "TOPLEFT", 142, -106)
 
-    page.showOfflineCheck = MOS.UI.Components.CreateCheckButton("BootyGuildShowOffline", page.tablePanel or page, "UICheckButtonTemplate")
+    page.showOfflineCheck = Booty.UI.Components.CreateCheckButton("BootyGuildShowOffline", page.tablePanel or page, "UICheckButtonTemplate")
     page.showOfflineCheck:SetPoint("TOPLEFT", page, "TOPLEFT", 232, -104)
     page.showOfflineCheck:SetWidth(22); page.showOfflineCheck:SetHeight(22)
-    page.showOfflineCheck.label = MOS.UI.Components.CreateLabel(page.showOfflineCheck, nil, "OVERLAY", "GameFontHighlightSmall")
+    page.showOfflineCheck.label = Booty.UI.Components.CreateLabel(page.showOfflineCheck, nil, "OVERLAY", "GameFontHighlightSmall")
     page.showOfflineCheck.label:SetPoint("LEFT", page.showOfflineCheck, "RIGHT", 2, 0)
     page.showOfflineCheck.label:SetText("Show offline")
 
-    page.modeButton = MOS.UI.Components.CreateControl(nil, page.tablePanel or page)
+    page.modeButton = Booty.UI.Components.CreateControl(nil, page.tablePanel or page)
     page.modeButton:SetWidth(22); page.modeButton:SetHeight(22)
     -- Spellbook artwork has transparent right padding; align its visible edge with the scrollbar arrows.
     page.modeButton:SetPoint("TOPRIGHT", page, "TOPRIGHT", -6, -102)
     page.modeButton:SetNormalTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Up")
     page.modeButton:SetPushedTexture("Interface\\Buttons\\UI-SpellbookIcon-NextPage-Down")
     page.modeButton:SetHighlightTexture("Interface\\Buttons\\UI-Common-MouseHilight")
-    page.modeButton.label = MOS.UI.Components.CreateLabel(page.modeButton, nil, "OVERLAY", "GameFontNormalSmall")
+    page.modeButton.label = Booty.UI.Components.CreateLabel(page.modeButton, nil, "OVERLAY", "GameFontNormalSmall")
     page.modeButton.label:SetPoint("RIGHT", page.modeButton, "LEFT", -4, 0)
     page.modeButton.label:SetText("Show Player Status")
-    MOS.UI.Components.AttachTooltip(page.modeButton, "Show player status", "Switch between guild notes and player status columns.")
+    Booty.UI.Components.AttachTooltip(page.modeButton, "Show player status", "Switch between guild notes and player status columns.")
 
-    local classPanel = MOS.UI.Components.CreateDropdownPanel(page.tablePanel or page, classToggle, 130, 230, 20)
-    local rankPanel = MOS.UI.Components.CreateDropdownPanel(page.tablePanel or page, rankToggle, 130, 230, 20)
+    local classPanel = Booty.UI.Components.CreateDropdownPanel(page.tablePanel or page, classToggle, 130, 230, 20)
+    local rankPanel = Booty.UI.Components.CreateDropdownPanel(page.tablePanel or page, rankToggle, 130, 230, 20)
     local dismiss = classPanel.dismiss
     return { sortHint = sortHint, label = label, classToggle = classToggle, rankToggle = rankToggle, classPanel = classPanel, rankPanel = rankPanel, dismiss = dismiss }
 end
@@ -302,7 +302,7 @@ local rosterHeaderSpecs = {
 }
 
 local function CreateHeaderButton(page, controller, text, x, width, key, sortable)
-    return MOS.UI.Components.Table.CreateHeader(page.tablePanel or page, controller, text, x, -130, width, key, sortable)
+    return Booty.UI.Components.Table.CreateHeader(page.tablePanel or page, controller, text, x, -130, width, key, sortable)
 end
 
 -- Pure layout calculation. Keeping this outside the view prevents accidental
@@ -389,8 +389,8 @@ function RosterManagement.CreateFilterController(options)
             for index = 1, table.getn(ranks) do self.selectedRanks[ranks[index]] = true end
             self.rankInitialized = true
         end
-        MOS.UI.Components.FilterPanel.Refresh(self.classPanel, classes, self.selectedClasses, self.refresh)
-        MOS.UI.Components.FilterPanel.Refresh(self.rankPanel, ranks, self.selectedRanks, self.refresh)
+        Booty.UI.Components.FilterPanel.Refresh(self.classPanel, classes, self.selectedClasses, self.refresh)
+        Booty.UI.Components.FilterPanel.Refresh(self.rankPanel, ranks, self.selectedRanks, self.refresh)
         self.page.filterData = data
     end
 
@@ -421,7 +421,7 @@ function RosterManagement.CreateHeaders(page, onSort)
     ui.zone:Hide(); ui.lastOnline:Hide()
     ui.notes = CreateHeaderButton(page, ui.controller, "Public note", 399, 174, "publicNote", false)
     ui.officer = CreateHeaderButton(page, ui.controller, "Officer note", 399, 100, "officerNote", false); ui.officer:Hide()
-    page.tableViewport = MOS.UI.Components.CreateContainer(nil, page.tablePanel or page)
+    page.tableViewport = Booty.UI.Components.CreateContainer(nil, page.tablePanel or page)
     page.tableViewport:SetPoint("TOPLEFT", ui.buttons[1], "BOTTOMLEFT", 0, -2); page.tableViewport:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", -30, 32)
     page.officerHeader = ui.officer
     page.guildColumns = {
@@ -489,15 +489,15 @@ end
 local function OnRowLeave()
     this.hover:Hide()
     if this.displayedMember and this.controller and not this.controller.isSelected(this.displayedMember) then
-        if this.memberBackground then MOS.UI.Components.SetRowColor(this, this.memberBackground, 1) end
+        if this.memberBackground then Booty.UI.Components.SetRowColor(this, this.memberBackground, 1) end
         this:SetBackdropBorderColor(0, 0, 0, 0)
     end
 end
 
 local function CreateActionButton(row, text, action, x)
-    local button = MOS.UI.Components.CreateArrowButton(row.actionPanel, action == "promote" and "up" or "down")
+    local button = Booty.UI.Components.CreateArrowButton(row.actionPanel, action == "promote" and "up" or "down")
     button:SetPoint("TOPRIGHT", row.actionPanel, "TOPRIGHT", x, -6)
-    MOS.UI.Components.AttachTooltip(button, text, text .. " this guild member.")
+    Booty.UI.Components.AttachTooltip(button, text, text .. " this guild member.")
     button.action = action
     button.ownerRow = row
     button:SetScript("OnClick", OnActionClick)
@@ -505,7 +505,7 @@ local function CreateActionButton(row, text, action, x)
 end
 
 local function AddCell(row, key, x, width)
-    row[key] = MOS.UI.Components.CreateLabel(row, nil, "OVERLAY", "GameFontHighlightSmall")
+    row[key] = Booty.UI.Components.CreateLabel(row, nil, "OVERLAY", "GameFontHighlightSmall")
     row[key]:SetPoint("TOPLEFT", row, "TOPLEFT", x, -1)
     row[key]:SetWidth(width)
     row[key]:SetHeight(18)
@@ -513,20 +513,20 @@ local function AddCell(row, key, x, width)
 end
 
 function RosterManagement.CreateRow(parent, index, rowHeight, controller)
-    local row = MOS.UI.Components.CreateControl(nil, parent)
+    local row = Booty.UI.Components.CreateControl(nil, parent)
     row.controller = controller
     row:SetPoint("TOPLEFT", parent, "TOPLEFT", 12, -134 - (index * rowHeight))
     row:SetWidth(560)
     row:SetHeight(rowHeight)
     row:EnableMouse(true)
     row:RegisterForClicks("LeftButtonUp", "RightButtonUp")
-    row.hover = MOS.UI.Components.CreateTexture(row, nil, "ARTWORK")
+    row.hover = Booty.UI.Components.CreateTexture(row, nil, "ARTWORK")
     row.hover:SetAllPoints(row); row.hover:SetTexture(0.65, 0.65, 0.65, 0.16); row.hover:Hide()
     row:SetBackdrop({ bgFile = "Interface\\Buttons\\WHITE8X8", edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 8, edgeSize = 8, insets = { left = 2, right = 2, top = 2, bottom = 2 } })
     row:SetBackdropColor(0, 0, 0, 0)
     row:SetBackdropBorderColor(0, 0, 0, 0)
-    MOS.UI.Components.RegisterSkinnedSurface(row, "row", { bgFile = "Interface\\Buttons\\WHITE8X8", edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 8, edgeSize = 8, insets = { left = 2, right = 2, top = 2, bottom = 2 } }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 })
-    row.selection = MOS.UI.Components.CreateTexture(row, nil, "ARTWORK")
+    Booty.UI.Components.RegisterSkinnedSurface(row, "row", { bgFile = "Interface\\Buttons\\WHITE8X8", edgeFile = "Interface\\Tooltips\\UI-Tooltip-Border", tile = true, tileSize = 8, edgeSize = 8, insets = { left = 2, right = 2, top = 2, bottom = 2 } }, { 0, 0, 0, 0 }, { 0, 0, 0, 0 })
+    row.selection = Booty.UI.Components.CreateTexture(row, nil, "ARTWORK")
     row.selection:SetAllPoints(row)
     row.selection:SetTexture(0.65, 0.65, 0.65, 0.16)
     row.selection:Hide()
@@ -542,7 +542,7 @@ function RosterManagement.CreateRow(parent, index, rowHeight, controller)
     row.zone:Hide()
     row.lastOnline:Hide()
 
-    row.actionViewport, row.actionPanel = MOS.UI.Components.CreateClippedContent(row, 204)
+    row.actionViewport, row.actionPanel = Booty.UI.Components.CreateClippedContent(row, 204)
     row.actionViewport:SetPoint("TOPLEFT", row, "TOPLEFT", 4, -20)
     row.actionViewport:SetWidth(640)
     row.actionViewport:SetHeight(204)
@@ -572,7 +572,7 @@ end
 local rosterFieldNames = { notes = "publicNote", officer = "officerNote" }
 function RosterManagement.MeasureColumns(page, columns, members, available)
     if not page.columnMeasure then
-        page.columnMeasure = MOS.UI.Components.CreateLabel(page, nil, "OVERLAY", "GameFontHighlightSmall")
+        page.columnMeasure = Booty.UI.Components.CreateLabel(page, nil, "OVERLAY", "GameFontHighlightSmall")
         page.columnMeasure:Hide()
         page.columnMeasureFont, page.columnMeasureSize, page.columnMeasureFlags = page.columnMeasure:GetFont()
     end
@@ -613,7 +613,7 @@ function RosterManagement.MeasureColumns(page, columns, members, available)
     local growth = 0
     for index = 1, table.getn(columns) do growth = growth + columns[index].growthWeight end
     if growth == 0 then for index = 1, table.getn(columns) do columns[index].growthWeight = columns[index].fraction end end
-    MOS.UI.Components.Table.AllocateColumnWidths(columns, math.max(1, available - gaps))
+    Booty.UI.Components.Table.AllocateColumnWidths(columns, math.max(1, available - gaps))
 end
 
 function RosterManagement.ApplyRowColumns(row, columns, tableWidth)
@@ -640,7 +640,7 @@ function RosterManagement.GetVisibleColumns(page, settings)
         local source = group == 1 and page.guildColumns or page.playerColumns
         for index = 1, table.getn(source) do
             local column = source[index]
-            if ((page.statusMode and group == 2) or (not page.statusMode and group == 1)) and (column.key == "name" or settings["rosterShow" .. rosterColumnSettings[column.key]] ~= false) and (column.key ~= "officer" or MOS.Services.Roster.CanManage("viewOfficerNote")) then
+            if ((page.statusMode and group == 2) or (not page.statusMode and group == 1)) and (column.key == "name" or settings["rosterShow" .. rosterColumnSettings[column.key]] ~= false) and (column.key ~= "officer" or Booty.Services.Roster.CanManage("viewOfficerNote")) then
                 count = count + 1
                 local target = visible[count]
                 if not target then target = {}; table.insert(visible, target) end
@@ -698,7 +698,7 @@ function RosterManagement.ApplyMemberColors(row, visibleIndex)
     local settings = BootyGuildDB or {}
     local background = settings.rosterBackgroundColor or defaultBackground
     local hover = settings.rosterHoverColor or defaultHover
-    MOS.UI.Components.SetAlternatingRowColor(row, background, visibleIndex, settings.rosterOddLightness)
+    Booty.UI.Components.SetAlternatingRowColor(row, background, visibleIndex, settings.rosterOddLightness)
     row.hover:SetTexture(hover[1], hover[2], hover[3], 1)
     row.selection:SetTexture(hover[1], hover[2], hover[3], 1)
 end
@@ -707,9 +707,9 @@ function RosterManagement.BindRow(row, member, visibleIndex, selectedName, rowHe
     row.name:SetText(member.name or "")
     row.level:SetText(member.level or "")
     row.class:SetText(member.class or "")
-    row.rank:SetText(MOS.Services.RankPolicy.GetDisplayName(member.rank or ""))
+    row.rank:SetText(Booty.Services.RankPolicy.GetDisplayName(member.rank or ""))
     row.notes:SetText(member.publicNote or "")
-    row.officer:SetText(MOS.Services.Roster.CanManage("viewOfficerNote") and (member.officerNote or "") or "")
+    row.officer:SetText(Booty.Services.Roster.CanManage("viewOfficerNote") and (member.officerNote or "") or "")
     row.zone:SetText(member.zone or "")
     row.lastOnline:SetText(RosterManagement.FormatLastOnline(member))
     row.hover:Hide()
@@ -720,7 +720,7 @@ function RosterManagement.BindRow(row, member, visibleIndex, selectedName, rowHe
     RosterManagement.ApplyMemberColors(row, visibleIndex)
     if useClassColors then
         local classKey = string.upper(member.classFile or member.class or "")
-        local classColor = (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classKey]) or MOS.UI.Components.Theme.classColors[classKey]
+        local classColor = (RAID_CLASS_COLORS and RAID_CLASS_COLORS[classKey]) or Booty.UI.Components.Theme.classColors[classKey]
         if classColor then
             row.name:SetTextColor(classColor.r * shade, classColor.g * shade, classColor.b * shade)
             row.class:SetTextColor(classColor.r * shade, classColor.g * shade, classColor.b * shade)
@@ -741,7 +741,7 @@ function RosterManagement.BindRow(row, member, visibleIndex, selectedName, rowHe
         row:SetHeight(expandedHeight)
         RosterManagement.BindMemberDetails(row, member)
         row:Show()
-        MOS.UI.Components.RefreshClippedContent(row.actionViewport)
+        Booty.UI.Components.RefreshClippedContent(row.actionViewport)
         return expandedHeight
     end
     if member.name == selectedName then row.selection:Show() else row.selection:Hide() end
@@ -775,13 +775,13 @@ function RosterManagement.CreateListController(page, rowHeight, rowController)
         rowHeight = rowHeight,
         rowController = rowController,
     }
-    controller.scrollFrame = MOS.UI.Components.CreateScrollFrame("BootyGuildRosterScrollFrame", page.tablePanel or page, "FauxScrollFrameTemplate")
+    controller.scrollFrame = Booty.UI.Components.CreateScrollFrame("BootyGuildRosterScrollFrame", page.tablePanel or page, "FauxScrollFrameTemplate")
     controller.scrollFrame:SetPoint("TOPLEFT", page, "TOPLEFT", -4, -145)
     controller.scrollFrame:SetPoint("BOTTOMRIGHT", page, "BOTTOMRIGHT", -6, 18)
     controller.scrollFrame.rowHeight = rowHeight
     controller.scrollFrame.listController = controller
     controller.scrollFrame:SetScript("OnVerticalScroll", OnListScroll)
-    MOS.UI.Components.RegisterSkinnedScrollBar(getglobal("BootyGuildRosterScrollFrameScrollBar"))
+    Booty.UI.Components.RegisterSkinnedScrollBar(getglobal("BootyGuildRosterScrollFrameScrollBar"))
     page.listController = controller
     return controller
 end
@@ -845,9 +845,9 @@ function RosterManagement.SetDataVisible(controller, visible)
     controller.infoButton[method](controller.infoButton)
     controller.addButton[method](controller.addButton)
     controller.controlButton[method](controller.controlButton)
-    if not MOS.Services.Roster.CanManage("invite") then controller.addButton:Hide()
-    else MOS.UI.Components.SetButtonEnabled(controller.addButton, true) end
-    if not MOS.Services.Roster.CanManage("control") then controller.controlButton:Hide() end
+    if not Booty.Services.Roster.CanManage("invite") then controller.addButton:Hide()
+    else Booty.UI.Components.SetButtonEnabled(controller.addButton, true) end
+    if not Booty.Services.Roster.CanManage("control") then controller.controlButton:Hide() end
     controls.footer[method](controls.footer)
     local i
     for i = 1, table.getn(page.listHeaderUI.buttons) do
@@ -929,8 +929,8 @@ function RosterManagement.RenderList(page, visibleMembers, columns, selectedName
     controller.lastViewportHeight = availableHeight; controller.lastTableWidth = tableWidth
     controller.lastSelectedName = selectedName
     controller.lastVisibleRowCount = visibleRowCount
-    local offset = MOS.UI.Components.UpdateScrollFrame(controller.scrollFrame, table.getn(visibleMembers), visibleRowCount, rowHeight)
-    MOS.UI.Components.SetScrollBarVisible(scrollbar, needsScroll and availableHeight >= 48)
+    local offset = Booty.UI.Components.UpdateScrollFrame(controller.scrollFrame, table.getn(visibleMembers), visibleRowCount, rowHeight)
+    Booty.UI.Components.SetScrollBarVisible(scrollbar, needsScroll and availableHeight >= 48)
     page.measuredCapacity = visibleRowCount
     page.measuredOffset = offset
     page.measuredCount = table.getn(visibleMembers)
@@ -1158,7 +1158,7 @@ function RosterManagement.DeactivateDataController(controller)
 end
 
 function RosterManagement.ActivateDataController(controller, scanAlreadyStarted)
-    MOS.Database.Ensure()
+    Booty.Database.Ensure()
     if not BootyGuildDB.rosterLiveTrackingEnabled then
         RosterManagement.DeactivateDataController(controller)
         return
@@ -1196,7 +1196,7 @@ function RosterManagement.AttachInteractions(options)
     options.exportButton:SetScript("OnClick", function() options.requestScan("reload") end)
     page.showOfflineCheck:SetScript("OnClick", function()
         options.ensureDatabase()
-        MOS.Database.SetSetting("showOfflineMembers", this:GetChecked() and true or false)
+        Booty.Database.SetSetting("showOfflineMembers", this:GetChecked() and true or false)
         options.clearSelection()
         options.refresh(true)
     end)
@@ -1205,7 +1205,7 @@ function RosterManagement.AttachInteractions(options)
         options.refresh(false)
     end)
     options.searchBox:SetScript("OnTextChanged", function() options.refresh(true) end)
-    MOS.UI.Components.AttachPlaceholder(options.searchBox,"Search...")
+    Booty.UI.Components.AttachPlaceholder(options.searchBox,"Search...")
     RosterManagement.SetListRefreshCallback(options.listController, options.refresh)
 
     page.layoutElapsed = 0; page.layoutWidth = 0; page.layoutHeight = 0
@@ -1256,19 +1256,19 @@ local function RosterCaptionWidth(page, control, padding, minimum)
     local label = control.label or control
     local caption = control:GetText() or ""
     local font, size, flags = label:GetFont()
-    if control.mosRosterCaption == caption and control.mosRosterFont == font
-        and control.mosRosterSize == size and control.mosRosterFlags == flags then
-        return control.mosRosterWidth
+    if control.bootyRosterCaption == caption and control.bootyRosterFont == font
+        and control.bootyRosterSize == size and control.bootyRosterFlags == flags then
+        return control.bootyRosterWidth
     end
     local measure = page.rosterFilterMeasure
     if not measure then
-        measure = MOS.UI.Components.CreateLabel(page, nil, "OVERLAY", "GameFontHighlightSmall")
+        measure = Booty.UI.Components.CreateLabel(page, nil, "OVERLAY", "GameFontHighlightSmall")
         measure:SetWidth(0); measure:Hide(); page.rosterFilterMeasure = measure
     end
     measure:SetFont(font, size, flags); measure:SetText(caption)
     local width = math.max(minimum, math.ceil(measure:GetStringWidth()) + padding)
-    control.mosRosterCaption, control.mosRosterFont = caption, font
-    control.mosRosterSize, control.mosRosterFlags, control.mosRosterWidth = size, flags, width
+    control.bootyRosterCaption, control.bootyRosterFont = caption, font
+    control.bootyRosterSize, control.bootyRosterFlags, control.bootyRosterWidth = size, flags, width
     return width
 end
 
@@ -1282,9 +1282,9 @@ function RosterManagement.LayoutChrome(page, controls, motdText)
     local getPresentation = page.host and page.host.GetPresentationSetting
     local menuStyle = getPresentation and getPresentation("menuStyle") or "buttons"
     local tabs = menuStyle == "tabs" or menuStyle == "bottomTabs"
-    local leftOutset = 1.5 + (tabs and (MOS.UI.Components.IsClassicSkin() and 0 or 5) or 0)
-    if page.tablePanel then MOS.UI.Components.JoinSurfaceEdges(page.tablePanel, true, true, leftOutset, 1.5) end
-    if page.actionsPanel then MOS.UI.Components.JoinSurfaceEdges(page.actionsPanel, true, false, leftOutset, 1.5) end
+    local leftOutset = 1.5 + (tabs and (Booty.UI.Components.IsClassicSkin() and 0 or 5) or 0)
+    if page.tablePanel then Booty.UI.Components.JoinSurfaceEdges(page.tablePanel, true, true, leftOutset, 1.5) end
+    if page.actionsPanel then Booty.UI.Components.JoinSurfaceEdges(page.actionsPanel, true, false, leftOutset, 1.5) end
     local actionBottom = getPresentation and getPresentation("hideStatusVersionBar") and 3.5 or 6
     if page.actionsPanel then page.actionsPanel:SetHeight(28 + actionBottom) end
     local width, height = RosterSpan(page)
@@ -1306,7 +1306,7 @@ function RosterManagement.LayoutChrome(page, controls, motdText)
         controls.footer:SetPoint("TOPLEFT", page, "TOPLEFT", 0, -42 + headerShift)
         controls.footer:SetPoint("TOPRIGHT", page, "TOPRIGHT", 0, -42 + headerShift)
     end
-    controls.footer:SetHeight(17 + MOS.UI.Components.MeasureTextHeight(controls.footer.guild, math.max(1, width - 16)) + MOS.UI.Components.MeasureTextHeight(controls.footer.motd, math.max(1, width - 16), true))
+    controls.footer:SetHeight(17 + Booty.UI.Components.MeasureTextHeight(controls.footer.guild, math.max(1, width - 16)) + Booty.UI.Components.MeasureTextHeight(controls.footer.motd, math.max(1, width - 16), true))
 
     if controls.footer.rule then controls.footer.rule:Hide() end
     if page.tablePanel then
@@ -1330,19 +1330,19 @@ function RosterManagement.LayoutChrome(page, controls, motdText)
     controls.filtersLabel:Hide()
     controls.classFilter:SetHeight(24); controls.rankFilter:SetHeight(24)
     if settings.rosterShowClassFilter ~= false then
-        controls.classFilter.mosFlowWidth = RosterCaptionWidth(page, controls.classFilter, 30, 84)
+        controls.classFilter.bootyFlowWidth = RosterCaptionWidth(page, controls.classFilter, 30, 84)
         controls.classFilter:Show(); table.insert(flow, controls.classFilter)
     else controls.classFilter:Hide() end
     if settings.rosterShowRankFilter ~= false then
-        controls.rankFilter.mosFlowWidth = RosterCaptionWidth(page, controls.rankFilter, 30, 84)
+        controls.rankFilter.bootyFlowWidth = RosterCaptionWidth(page, controls.rankFilter, 30, 84)
         controls.rankFilter:Show(); table.insert(flow, controls.rankFilter)
     else controls.rankFilter:Hide() end
-    local filterBottom = MOS.UI.Components.LayoutFlow(page.filterToolbar or page.tablePanel or page, flow, 6, 8, available, 8)
+    local filterBottom = Booty.UI.Components.LayoutFlow(page.filterToolbar or page.tablePanel or page, flow, 6, 8, available, 8)
     if table.getn(flow) > 0 then
         local last = flow[table.getn(flow)]
         local _, _, _, lastX, lastY = last:GetPoint(1)
-        x, y = lastX + math.min(available, last.mosFlowWidth) + 8, lastY
-        MOS.UI.Components.ReflowControlText(controls.classFilter); MOS.UI.Components.ReflowControlText(controls.rankFilter)
+        x, y = lastX + math.min(available, last.bootyFlowWidth) + 8, lastY
+        Booty.UI.Components.ReflowControlText(controls.classFilter); Booty.UI.Components.ReflowControlText(controls.rankFilter)
     end
     local offlineLabelWidth = settings.rosterShowOffline ~= false and RosterCaptionWidth(page, controls.showOffline.label, 2, 70) or 0
     local offlineWidth = settings.rosterShowOffline ~= false and offlineLabelWidth + 26 or 0
@@ -1369,7 +1369,7 @@ function RosterManagement.LayoutChrome(page, controls, motdText)
     local actionIndex
     for actionIndex = 1, actionCount do
         local action = controls.actions[actionIndex]
-        action.available = not action.permission or MOS.Services.Roster.CanManage(action.permission)
+        action.available = not action.permission or Booty.Services.Roster.CanManage(action.permission)
         if action.available then baseWidth = baseWidth + action.width; visibleCount = visibleCount + 1 end
     end
     baseWidth = math.max(1, baseWidth + math.max(0, visibleCount - 1) * 6)
@@ -1379,13 +1379,13 @@ function RosterManagement.LayoutChrome(page, controls, motdText)
     for actionIndex = 1, actionCount do
         local action = controls.actions[actionIndex]
         if action.available then
-            if action.permission then MOS.UI.Components.SetButtonEnabled(action.button, true) end
+            if action.permission then Booty.UI.Components.SetButtonEnabled(action.button, true) end
             action.button:Show()
             action.button:ClearAllPoints()
             action.button:SetScale(1)
             action.button:SetWidth(math.floor(action.width * widthScale))
             action.button:SetHeight(22)
-            MOS.UI.Components.FitButtonLabel(action.button, action.button:GetWidth() - 16)
+            Booty.UI.Components.FitButtonLabel(action.button, action.button:GetWidth() - 16)
             action.button:SetPoint("BOTTOMLEFT", page.actionsPanel or page, "BOTTOMLEFT", actionX, actionBottom)
             actionX = actionX + math.floor(action.width * widthScale) + 6
         else action.button:Hide() end
@@ -1405,7 +1405,7 @@ function RosterManagement.LayoutChrome(page, controls, motdText)
 end
 
 function RosterManagement.CreateMemberDetails(row)
-    local C, panel = MOS.UI.Components, row.actionPanel
+    local C, panel = Booty.UI.Components, row.actionPanel
     row.details = {}
     local function Text(key, y, color, small)
         local label = small and C.CreateColumnLabel(panel, "", color) or C.CreateComponentLabel(panel, "", color)
@@ -1430,7 +1430,7 @@ function RosterManagement.CreateMemberDetails(row)
 end
 
 function RosterManagement.OpenNoteEditor(row, key)
-    local page, C, service = row.controller.page or row:GetParent(), MOS.UI.Components, MOS.Services.Roster
+    local page, C, service = row.controller.page or row:GetParent(), Booty.UI.Components, Booty.Services.Roster
     local member = row.displayedMember
     if not member or not service.CanManage(key) then return end
     if not page.noteEditor then
@@ -1455,13 +1455,13 @@ function RosterManagement.OpenNoteEditor(row, key)
 end
 
 function RosterManagement.BindMemberDetails(row, member)
-    local C, service = MOS.UI.Components, MOS.Services.Roster
+    local C, service = Booty.UI.Components, Booty.Services.Roster
     if not row.details then RosterManagement.CreateMemberDetails(row) end
     local officerVisible = service.CanManage("viewOfficerNote")
     row.officer:SetText(officerVisible and (member.officerNote or "") or "")
     row.details.name:SetText(member.name or "")
     row.details.level:SetText("Level " .. tostring(member.level or 0) .. " " .. (member.class or ""))
-    row.details.rank:SetText("Rank: |cffffffff" .. MOS.Services.RankPolicy.GetDisplayName(member.rank or "Unknown") .. "|r")
+    row.details.rank:SetText("Rank: |cffffffff" .. Booty.Services.RankPolicy.GetDisplayName(member.rank or "Unknown") .. "|r")
     row.details.lastOnline:SetText("Last online: " .. (member.online and "|cffffffffOnline|r" or "|cff808080" .. RosterManagement.FormatLastOnline(member) .. " ago|r"))
     local public, officer = row.publicNoteField, row.officerNoteField
     public:ClearAllPoints(); public:SetPoint("TOPLEFT", row.actionPanel, "TOPLEFT", 12, -110)
@@ -1491,7 +1491,7 @@ function RosterManagement.BindMemberDetails(row, member)
 end
 
 function RosterManagement.OpenMemberMenu(row)
-    local page, C = row:GetParent(), MOS.UI.Components
+    local page, C = row:GetParent(), Booty.UI.Components
     if not page.memberMenu then
         page.memberMenu = C.CreateContextMenu(page, {
             { "Whisper", "whisper" }, { "Invite", "group" }, { "Target", "target" },
@@ -1501,14 +1501,14 @@ function RosterManagement.OpenMemberMenu(row)
             if action == "report" then
                 if not page.memberReport then
                     page.memberReport = C.CreateTextEditor("BootyGuildRosterReport", "Report player", 1000, function(reason)
-                        if MOS.Services.Roster.PerformSocialAction("report", page.reportMemberName, reason) then page.memberReport:Hide()
+                        if Booty.Services.Roster.PerformSocialAction("report", page.reportMemberName, reason) then page.memberReport:Hide()
                         else page.memberReport:SetMessage("Enter a reason; reporting requires GM ticket support.", true); return false end
                     end)
                     page.memberReport.save:SetText("Submit")
                 end
                 page.reportMemberName = name
                 page.memberReport:Open(""); page.memberReport:BringToFront(600); page.memberReport:SetMessage("Report " .. name .. ": describe the issue for a GM.", false)
-            else MOS.Services.Roster.PerformSocialAction(action, name) end
+            else Booty.Services.Roster.PerformSocialAction(action, name) end
         end)
     end
     page.memberMenu.title:SetText(row.displayedMember.name)
@@ -1517,10 +1517,10 @@ function RosterManagement.OpenMemberMenu(row)
 end
 
 function RosterManagement.BindPermissionEvents(page)
-    local watcher = MOS.UI.Components.CreateContainer(nil, page)
+    local watcher = Booty.UI.Components.CreateContainer(nil, page)
     local function Refresh(force)
         if not IsRosterVisible(page) then return end
-        local C, service = MOS.UI.Components, MOS.Services.Roster
+        local C, service = Booty.UI.Components, Booty.Services.Roster
         if service.ReadManagementState then
             local flags, rank, rankCount, playerName = service.ReadManagementState()
             if not force and watcher.managementFlags == flags and watcher.managementRank == rank

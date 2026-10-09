@@ -1,6 +1,6 @@
-local MOS = BootyGuild
-local Roster = MOS.Modules.RosterManagement
-local C = MOS.UI.Components
+local Booty = BootyGuild
+local Roster = Booty.Modules.RosterManagement
+local C = Booty.UI.Components
 
 local function Place(window, label, y)
     label:ClearAllPoints()
@@ -42,14 +42,14 @@ function Roster.LayoutDetailsWindow(window, member)
     PlaceDetailValue(window, window.zoneLabel, window.zoneValue, -48, "Zone:")
     window.zoneValue:SetText(member.zone or "Unknown")
     PlaceDetailValue(window, window.details.rank, window.rankValue, -66, "Rank:")
-    window.rankValue:SetText(MOS.Services.RankPolicy.GetDisplayName(member.rank or "Unknown"))
+    window.rankValue:SetText(Booty.Services.RankPolicy.GetDisplayName(member.rank or "Unknown"))
     PlaceDetailValue(window, window.details.lastOnline, window.lastOnlineValue, -84, "Last online:")
     window.lastOnlineValue:SetText(member.online and "Online" or (Roster.FormatLastOnline(member) .. " ago"))
     if member.online then window.lastOnlineValue:SetTextColor(1,1,1) else window.lastOnlineValue:SetTextColor(0.5,0.5,0.5) end
     window.promoteButton:ClearAllPoints(); window.promoteButton:SetPoint("TOPRIGHT", window, "TOPRIGHT", -34, -62)
     window.demoteButton:ClearAllPoints(); window.demoteButton:SetPoint("TOPRIGHT", window, "TOPRIGHT", -10, -62)
-    local canPromote = MOS.Services.Roster.CanManage("promote", member)
-    local canDemote = MOS.Services.Roster.CanManage("demote", member)
+    local canPromote = Booty.Services.Roster.CanManage("promote", member)
+    local canDemote = Booty.Services.Roster.CanManage("demote", member)
     window.promoteButton:SetInactive(not canPromote); window.promoteButton:Show()
     window.demoteButton:SetInactive(not canDemote); window.demoteButton:Show()
     if canPromote then window.promoteButton:Enable() else window.promoteButton:Disable() end
@@ -68,11 +68,11 @@ function Roster.LayoutDetailsWindow(window, member)
     officer:SetPoint("TOPRIGHT", window, "TOPRIGHT", -12, -178); officer:SetHeight(36)
     officer.label:ClearAllPoints(); officer.label:SetPoint("TOPLEFT", officer, "TOPLEFT", 5, -5); officer.label:SetPoint("BOTTOMRIGHT", officer, "BOTTOMRIGHT", -5, 5)
     officer.title:ClearAllPoints(); officer.title:SetPoint("BOTTOMLEFT", officer, "TOPLEFT", 0, 4)
-    local canSeeOfficer = MOS.Services.Roster.CanManage("viewOfficerNote")
+    local canSeeOfficer = Booty.Services.Roster.CanManage("viewOfficerNote")
     window:SetHeight(canSeeOfficer and 258 or 196)
     window.removeButton:SetWidth(94); window.inviteButton:SetWidth(100)
-    if MOS.Services.Roster.CanManage("remove", member) then window.removeButton:Enable() else window.removeButton:Disable() end
-    if MOS.Services.Roster.CanManage("group", member) then window.inviteButton:Enable() else window.inviteButton:Disable() end
+    if Booty.Services.Roster.CanManage("remove", member) then window.removeButton:Enable() else window.removeButton:Disable() end
+    if Booty.Services.Roster.CanManage("group", member) then window.inviteButton:Enable() else window.inviteButton:Disable() end
 end
 
 function Roster.UpdateDetailsWindow(page, member)

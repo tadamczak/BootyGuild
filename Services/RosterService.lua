@@ -1,7 +1,7 @@
-local MOS = BootyGuild
+local Booty = BootyGuild
 
-MOS.Services.Roster = MOS.Services.Roster or {}
-local RosterService = MOS.Services.Roster
+Booty.Services.Roster = Booty.Services.Roster or {}
+local RosterService = Booty.Services.Roster
 
 function RosterService.IsInGuild()
     if type(IsInGuild) == "function" then
@@ -44,7 +44,7 @@ local function SnapshotData(members, guildName, realmName, scanStartedAt)
     local scanDuration = 0
     if scanStartedAt then scanDuration = GetTime() - scanStartedAt end
     return {
-        guildName = guildName, realmName = realmName, addonVersion = MOS.version,
+        guildName = guildName, realmName = realmName, addonVersion = Booty.version,
         scannedAt = scanTimestamp, scannedAtText = date("%Y-%m-%d %H:%M:%S", scanTimestamp),
         scanDurationSeconds = scanDuration, updatedAt = scanTimestamp, updatedBy = UnitName("player"),
         members = members,
@@ -52,9 +52,9 @@ local function SnapshotData(members, guildName, realmName, scanStartedAt)
 end
 
 function RosterService.BuildSnapshot(scanStartedAt)
-    MOS.Diagnostics.Count("scans")
-    MOS.Database.Ensure()
-    local key, guildName, realmName = MOS.Database.GetGuildIdentity()
+    Booty.Diagnostics.Count("scans")
+    Booty.Database.Ensure()
+    local key, guildName, realmName = Booty.Database.GetGuildIdentity()
     if not key then return nil, "not-in-guild" end
 
     local total = GetNumGuildMembers(true)
@@ -78,9 +78,9 @@ RosterService.SNAPSHOT_MERGE_WORK_LIMIT = 256
 function RosterService.StartSnapshot(scanStartedAt, generation)
     -- Caller-owned generation tracks roster-cache events. Identity/count are
     -- additional guards, not a native transaction/revision guarantee.
-    MOS.Diagnostics.Count("scans")
-    MOS.Database.Ensure()
-    local key, guildName, realmName = MOS.Database.GetGuildIdentity()
+    Booty.Diagnostics.Count("scans")
+    Booty.Database.Ensure()
+    local key, guildName, realmName = Booty.Database.GetGuildIdentity()
     if not key then return nil, "not-in-guild" end
     local total = GetNumGuildMembers(true)
     if not total or total < 1 then return nil, "not-ready" end
@@ -102,7 +102,7 @@ local function SnapshotContext(job, generation)
     if not job then return false, "not-ready" end
     if job.state == "failed" or job.state == "finished" then return false, job.error or job.state end
     if job.generation ~= generation then return false, "generation-changed" end
-    local key = MOS.Database.GetGuildIdentity()
+    local key = Booty.Database.GetGuildIdentity()
     if key ~= job.guildKey then return false, "guild-changed" end
     if GetNumGuildMembers(true) ~= job.total then return false, "roster-changed" end
     return true
@@ -215,7 +215,7 @@ function RosterService.FinishSnapshot(job, generation)
 end
 
 function RosterService.StoreSnapshot(snapshot)
-    MOS.Database.StoreRosterSnapshot(snapshot)
+    Booty.Database.StoreRosterSnapshot(snapshot)
 end
 
 function RosterService.GetUniqueMemberValues(data, field)

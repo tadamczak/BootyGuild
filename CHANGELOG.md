@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.1.0-dev.7 — 2026-10-09
+
+- Use current Booty names for shared window components.
+
 ## 0.1.0-dev.6 — 2026-10-08
 
 - Remove unused legacy guild summary and roster callbacks; retain current screen-owned controllers and data.

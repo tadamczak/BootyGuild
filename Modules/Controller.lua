@@ -140,7 +140,7 @@ function Controller.Initialize(host)
     runtime.events:SetScript("OnEvent",function() Controller.HandleEvent(event,arg1) end)
     RegisterEvents()
     StaticPopupDialogs.BOOTY_GUILD_RELOAD = {
-        mosProjectTitle="Export guild roster",mosProjectOwner=GuildPromptOwner,text="The guild roster scan is complete. Reload the UI now to write it to disk?",
+        bootyProjectTitle="Export guild roster",bootyProjectOwner=GuildPromptOwner,text="The guild roster scan is complete. Reload the UI now to write it to disk?",
         button1="Reload now",button2="Later",
         OnAccept=ReloadGuildExport,
         OnCancel=function() Print("Guild data remains in memory. Use /reload before closing the game to save it.") end,

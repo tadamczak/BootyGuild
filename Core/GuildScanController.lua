@@ -1,8 +1,8 @@
-local MOS = BootyGuild
+local Booty = BootyGuild
 
-MOS.Core = MOS.Core or {}
+Booty.Core = Booty.Core or {}
 local GuildScanController = {}
-MOS.Core.GuildScanController = GuildScanController
+Booty.Core.GuildScanController = GuildScanController
 
 local LIVE_ORIGIN = "roster_live"
 local TRAILING_DELAY, MAX_TRAILING_DELAY = 0.15, 1
@@ -90,7 +90,7 @@ function GuildScanController.Create(options)
     controller.frame.delay = nil
     controller.frame:Hide()
     controller.frame:SetScript("OnUpdate", nil)
-    MOS.guildScanController = controller
+    Booty.guildScanController = controller
     return controller
 end
 

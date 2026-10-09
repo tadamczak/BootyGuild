@@ -1,9 +1,9 @@
-local MOS = BootyGuild
-local UI = MOS.UI.Components
+local Booty = BootyGuild
+local UI = Booty.UI.Components
 
-MOS.Modules = MOS.Modules or {}
+Booty.Modules = Booty.Modules or {}
 local GuildStatistics = {}
-MOS.Modules.GuildStatistics = GuildStatistics
+Booty.Modules.GuildStatistics = GuildStatistics
 
 local function Lower(value) return string.lower(tostring(value or "")) end
 local function SortNames(a,b) return Lower(a)<Lower(b) end
@@ -29,7 +29,7 @@ local function AddUniqueMember(groups, groupName, memberName)
 end
 local function DisplayRank(value)
     if value == nil or value == "" then return "Unknown" end
-    return tostring(MOS.Services.RankPolicy.GetDisplayName(value))
+    return tostring(Booty.Services.RankPolicy.GetDisplayName(value))
 end
 local function DisplayClass(value) return value and value ~= "" and value or "Unknown" end
 local function OnTableScroll() FauxScrollFrame_OnVerticalScroll(24, this.refreshCallback) end
@@ -47,7 +47,7 @@ local function ClassColor(className)
 end
 
 local function CreateFilterGroup(parent, buttonText, width)
-    local group = UI.CreateContainer(nil, parent); group:SetWidth(width); group:SetHeight(24); group.mosFlowWidth = width
+    local group = UI.CreateContainer(nil, parent); group:SetWidth(width); group:SetHeight(24); group.bootyFlowWidth = width
     group.button = UI.CreateDropdownButton(group, nil, buttonText, width); group.button:SetAllPoints(group); group.button:SetHeight(24)
     group.panel = UI.CreateDropdownPanel(parent, group.button, 150, 80, 50); UI.StyleProjectPopup(group.panel)
     group.button:SetScript("OnClick", function() if group.panel:IsVisible() then group.panel:Hide() else group.panel:Show() end end)
@@ -327,7 +327,7 @@ local function ProjectEntries(controller)
     controller.projectionDirty=false
 end
 
-if MOS.Diagnostics.Wrap then BuildModel=MOS.Diagnostics.Wrap("Guild Statistics model",BuildModel,2) end
+if Booty.Diagnostics.Wrap then BuildModel=Booty.Diagnostics.Wrap("Guild Statistics model",BuildModel,2) end
 
 local function LayoutTable(controller, rowWidth)
     UI.Table.AllocateColumnWidths(controller.table.columns, rowWidth)
@@ -401,7 +401,7 @@ local function RenderTable(controller)
     end
 end
 
-if MOS.Diagnostics.Wrap then RenderTable=MOS.Diagnostics.Wrap("Guild Statistics rows",RenderTable,1) end
+if Booty.Diagnostics.Wrap then RenderTable=Booty.Diagnostics.Wrap("Guild Statistics rows",RenderTable,1) end
 
 function GuildStatistics.AttachExport(view, button)
     button:SetParent(view.actionPanel or view.page); button:ClearAllPoints(); button:SetWidth(100); button:SetHeight(26); button:Show()
@@ -428,9 +428,9 @@ function GuildStatistics.CreateView(host, styleButton, refresh)
     view.scanButton = UI.CreateControl(nil, page); view.scanButton:SetWidth(160); view.scanButton:SetHeight(26); styleButton(view.scanButton, "Scan Guild Statistics")
     view.empty = UI.CreateLabel(page, nil, "OVERLAY", "GameFontDisableSmall"); view.empty:SetJustifyH("CENTER"); view.empty:Hide()
     view.filterPanel = UI.CreateToolbarSurface(page, false, true)
-    view.rankGroup = CreateFilterGroup(view.filterPanel, "Rank", 88);view.rankGroup.panel.allSelectedCaption="Rank";view.rankGroup.panel.emptyMeansAll=true;view.rankGroup.button.mosLabelJustify="LEFT"
-    view.classGroup = CreateFilterGroup(view.filterPanel, "Class", 96);view.classGroup.panel.allSelectedCaption="Class";view.classGroup.panel.emptyMeansAll=true;view.classGroup.button.mosLabelJustify="LEFT"
-    view.groupGroup = UI.CreateContainer(nil, view.filterPanel); view.groupGroup:SetWidth(112); view.groupGroup:SetHeight(24); view.groupGroup.mosFlowWidth=112
+    view.rankGroup = CreateFilterGroup(view.filterPanel, "Rank", 88);view.rankGroup.panel.allSelectedCaption="Rank";view.rankGroup.panel.emptyMeansAll=true;view.rankGroup.button.bootyLabelJustify="LEFT"
+    view.classGroup = CreateFilterGroup(view.filterPanel, "Class", 96);view.classGroup.panel.allSelectedCaption="Class";view.classGroup.panel.emptyMeansAll=true;view.classGroup.button.bootyLabelJustify="LEFT"
+    view.groupGroup = UI.CreateContainer(nil, view.filterPanel); view.groupGroup:SetWidth(112); view.groupGroup:SetHeight(24); view.groupGroup.bootyFlowWidth=112
     local groupChoices={{value="none",text="None"},{value="class",text="Class"},{value="rank",text="Rank"},{value="level",text="Level"}}
     view.groupLabel=UI.CreateLabel(view.groupGroup,nil,"OVERLAY","GameFontHighlightSmall");view.groupLabel:SetPoint("LEFT",view.groupGroup,"LEFT",0,0);view.groupLabel:SetText("Group by:")
     view.groupButton=UI.CreateDropdownButton(view.groupGroup,nil,"None",52);view.groupButton:SetPoint("RIGHT",view.groupGroup,"RIGHT",0,0);view.groupButton:SetHeight(24)
@@ -444,10 +444,10 @@ function GuildStatistics.CreateView(host, styleButton, refresh)
     end
     view.groupButton:SetScript("OnClick",function() if view.groupPanel:IsVisible() then view.groupPanel:Hide() else view.groupPanel:Show() end end)
     UI.StyleProjectPopup(view.groupPanel)
-    view.levelGroup=UI.CreateContainer(nil,view.filterPanel);view.levelGroup:SetWidth(72);view.levelGroup:SetHeight(24);view.levelGroup.mosFlowWidth=72
+    view.levelGroup=UI.CreateContainer(nil,view.filterPanel);view.levelGroup:SetWidth(72);view.levelGroup:SetHeight(24);view.levelGroup.bootyFlowWidth=72
     view.levelLabel=UI.CreateLabel(view.levelGroup,nil,"OVERLAY","GameFontHighlightSmall");view.levelLabel:SetPoint("LEFT",view.levelGroup,"LEFT",0,0);view.levelLabel:SetText("Level:")
     view.level=UI.CreateFramedEditBox(view.levelGroup,nil,32);view.level:SetPoint("RIGHT",view.levelGroup,"RIGHT",0,0);view.level:SetMaxLetters(2);view.level:SetScript("OnTextChanged",function() view.onFilterChanged() end)
-    view.searchGroup=UI.CreateContainer(nil,view.filterPanel);view.searchGroup:SetWidth(132);view.searchGroup:SetHeight(24);view.searchGroup.mosFlowWidth=132
+    view.searchGroup=UI.CreateContainer(nil,view.filterPanel);view.searchGroup:SetWidth(132);view.searchGroup:SetHeight(24);view.searchGroup.bootyFlowWidth=132
     view.searchLabel=UI.CreateLabel(view.searchGroup,nil,"OVERLAY","GameFontHighlightSmall");view.searchLabel:SetText("");view.searchLabel:Hide()
     view.search=UI.CreateFramedEditBox(view.searchGroup,nil,132);view.search:SetPoint("LEFT",view.searchGroup,"LEFT",0,0);view.search:SetScript("OnTextChanged",function() view.onFilterChanged() end);UI.AttachPlaceholder(view.search,"Search...")
     view.flow={view.rankGroup,view.classGroup,view.groupGroup,view.levelGroup,view.searchGroup}
@@ -510,9 +510,9 @@ local function LayoutContent(width,height,controller)
     local view,page=controller.view,controller.page
     local available=math.max(80,width-16)
     local font,size,flags=view.title:GetFont()
-    view.title.mosFitFontSize=view.title.mosFitFontSize or size
-    view.title:SetFont(font,view.title.mosFitFontSize,flags);view.title:SetWidth(0)
-    local titleWidth=math.min(view.title:GetStringWidth()+(view.title.mosHeadingIconInset or 0)+2,available*0.55)
+    view.title.bootyFitFontSize=view.title.bootyFitFontSize or size
+    view.title:SetFont(font,view.title.bootyFitFontSize,flags);view.title:SetWidth(0)
+    local titleWidth=math.min(view.title:GetStringWidth()+(view.title.bootyHeadingIconInset or 0)+2,available*0.55)
     view.title:ClearAllPoints();view.title:SetPoint("TOPLEFT",page,"TOPLEFT",8,-8);view.title:SetWidth(titleWidth)
     UI.FitButtonLabel(view.title,titleWidth)
     view.titleSeparator:ClearAllPoints();view.titleSeparator:SetPoint("BOTTOMLEFT",view.title,"BOTTOMRIGHT",8,0);view.titleSeparator:SetWidth(8);view.titleSeparator:SetHeight(16)
@@ -541,16 +541,16 @@ local function LayoutContent(width,height,controller)
         local flowWidth=math.max(1,width-16)
         local groupLabelWidth=math.ceil(view.groupLabel:GetStringWidth())
         local levelLabelWidth=math.ceil(view.levelLabel:GetStringWidth())
-        view.groupGroup.mosFlowWidth=groupLabelWidth+4+64
-        view.levelGroup.mosFlowWidth=levelLabelWidth+4+32
+        view.groupGroup.bootyFlowWidth=groupLabelWidth+4+64
+        view.levelGroup.bootyFlowWidth=levelLabelWidth+4+32
         local searchMinimum=66
         local searchMaximum=132
-        local precedingWidth=view.rankGroup.mosFlowWidth+view.classGroup.mosFlowWidth+view.groupGroup.mosFlowWidth+view.levelGroup.mosFlowWidth+24
+        local precedingWidth=view.rankGroup.bootyFlowWidth+view.classGroup.bootyFlowWidth+view.groupGroup.bootyFlowWidth+view.levelGroup.bootyFlowWidth+24
         local sameRowWidth=flowWidth-precedingWidth
         local searchGroupWidth
         if sameRowWidth>=searchMinimum then searchGroupWidth=math.min(searchMaximum,sameRowWidth)
         else searchGroupWidth=math.min(searchMaximum,math.max(searchMinimum,flowWidth)) end
-        view.searchGroup.mosFlowWidth=searchGroupWidth
+        view.searchGroup.bootyFlowWidth=searchGroupWidth
         local filterBottom=UI.LayoutFlow(view.filterPanel,view.flow,8,6,flowWidth,6)+6;view.filterPanel:SetHeight(filterBottom)
         view.rankGroup.button:SetWidth(view.rankGroup:GetWidth());view.classGroup.button:SetWidth(view.classGroup:GetWidth())
         view.groupButton:SetWidth(64);view.groupButton:ClearAllPoints();view.groupButton:SetPoint("LEFT",view.groupLabel,"RIGHT",4,0)
@@ -566,12 +566,12 @@ local function LayoutContent(width,height,controller)
 end
 
 function GuildStatistics.Layout(controller) UI.LayoutResponsiveCanvas(controller.page,LayoutContent,controller) end
-if MOS.Diagnostics.Wrap then GuildStatistics.Layout=MOS.Diagnostics.Wrap("Guild Statistics layout",GuildStatistics.Layout,1) end
+if Booty.Diagnostics.Wrap then GuildStatistics.Layout=Booty.Diagnostics.Wrap("Guild Statistics layout",GuildStatistics.Layout,1) end
 
 RefreshPresentation=function(controller,relayout)
     if not IsPresentationVisible(controller) then return end
     if controller.refreshing then return end
-    controller.refreshing=true;MOS.Diagnostics.Count("uiRefreshes")
+    controller.refreshing=true;Booty.Diagnostics.Count("uiRefreshes")
     if not controller.ready then
         if relayout then HideResults(controller);GuildStatistics.Layout(controller) end
         controller.refreshing=false;return
